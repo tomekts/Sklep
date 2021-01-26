@@ -1,0 +1,7 @@
+
+    {% for category in category_list %}
+            <a href="{% url 'Products:Category' category.id  %}">{{ category.name }}</a></p>
+
+        {% endfor %}
+
+

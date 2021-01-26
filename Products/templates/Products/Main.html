@@ -1,0 +1,24 @@
+<div>
+    <h1>{% include 'Products/Navbar.html' %}</h1>
+</div>
+
+<div style="clear:both"></div>
+
+
+<div style="width:200px; float:left">
+
+    {% include 'Products/Categories.html' %}
+</div>
+
+<div style="width:700px; float:left">
+    {% block product %}
+    {% block category %}
+        Super fajny sklep musisz cos kupic
+        <img src="https://image.flaticon.com/icons/png/512/69/69986.png" alt="cos niedziała XD" width="200" height="200">
+    {% endblock %}
+    {% endblock %}
+
+</div>
+
+
+<div style="clear:both"></div>

@@ -1,0 +1,9 @@
+{% extends 'Products/Main.html' %}
+{% block category %}
+
+ {% for product in product_in_cat %}
+            <a href="{% url 'Products:Product' product.id %}">{{ product.title }}</a></p>
+
+        {% endfor %}
+
+{% endblock %}
