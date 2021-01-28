@@ -1,3 +1,6 @@
+{% load static %}
+<link rel="stylesheet" type="text/css" href="{% static 'Products/style.css' %}">
+
 <div>
     <h1>{% include 'Products/Navbar.html' %}</h1>
 </div>
@@ -12,9 +15,11 @@
 
 <div style="width:700px; float:left">
     {% block product %}
+
     {% block category %}
         Super fajny sklep musisz cos kupic
-        <img src="https://image.flaticon.com/icons/png/512/69/69986.png" alt="cos niedziała XD" width="200" height="200">
+        <img src="{% static 'Images/cart.png' %}" alt="cos niedziała XD" width="200" height="200">
+
     {% endblock %}
     {% endblock %}
 

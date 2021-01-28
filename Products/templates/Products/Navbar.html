@@ -1,3 +1,13 @@
-<a href="{% url 'Products:Main' %}"><img src="https://www.flaticon.com/svg/vstatic/svg/25/25694.svg?token=exp=1611661908~hmac=5c1e21205b57ad5e9431b74486fcef04" alt="cos niedziała XD" width="40" height="40"></a>
+{% load static %}
+<a href="{% url 'Products:Main' %}"><img src="{% static 'Images/home-icon.png' %}" alt="cos niedziała XD" width="40" height="40"></a>
 
   Belka do ogarnięcia w przyszłości
+{% if  request.user.is_authenticated%}
+
+<a href="{% url 'Products:Logout' %}">wyloguj</a>{{request.user}}
+
+{% else %}
+
+<a href="{% url 'Products:Login' %}">zaloguj</a>
+{% endif %}
+
