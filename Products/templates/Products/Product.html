@@ -1,5 +1,9 @@
 {% extends 'Products/Main.html' %}
+{% load static %}
+
+
 {% block product %}
+    <div style="width:300px; float:left ">
     <h1>{{ object.title }}</h1>
 
     KAtegoria: {{ object.category }}</p>
@@ -7,6 +11,19 @@
 
     Opis:{{ object.description }}</p>
     cena:{{ object.price }}</p>
+
+
+        {% if  request.user.is_authenticated%}
+            kiedyś button dodania do koszyka tylko dla zalogowanych
+        {% else %}
+        zaloguj sie aby muc dodac produkt do koszyka
+        {%  endif%}
+    </div>
+    <div style="width:200px; float:left  ">
+
+    <img src=" {%  static s %}{{object.image}}" alt="cos niedziała XD" width="300px">
+
+    </div>
 
 {% endblock %}
 

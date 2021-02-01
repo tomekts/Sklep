@@ -1,8 +1,9 @@
 from django.shortcuts import render, redirect
-from .models import Products, Category
+from .models import Products, Category, Cart, CartProducts
 from django.contrib.auth.models import User
 from django.http import HttpResponse
 from django.views import generic
+from django.views.generic import ListView
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
@@ -68,8 +69,8 @@ class CategoryView(generic.DetailView):
 #         return context
 def Login(request):
 
-    if request.method== 'POST':
-        username= request.POST.get('username')
+    if request.method == 'POST':
+        username = request.POST.get('username')
         password = request.POST.get('password')
         user = authenticate(request, username=username, password=password)
 
@@ -82,8 +83,12 @@ def Login(request):
     context={}
     return render(request, 'Products/Login.html', context)
 
+
 def Logout(request):
+    ss = request.META.get('PATH_INFO', None)
+    print(request.session)
     logout(request)
+    print(ss)
     return redirect('Products:Main')
 
 def Register(request):
@@ -97,3 +102,20 @@ def Register(request):
 
     context = {'form': form}
     return render(request, 'Products/Register.html', context)
+
+
+class CartView(generic.ListView):
+    template_name = 'Products/Cart.html'
+    context_object_name = 'category_list'
+
+    def get_queryset(self):
+
+        return Category.objects.all()
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        print(self.request.user.id)
+        cart_id,bool = Cart.objects.filter(UserId=self.request.user.id).get_or_create(defaults={'UserId': self.request.user})
+        context['products_in_cart'] = CartProducts.objects.filter(CartId=cart_id)
+        context['products'] = Products.objects.all()
+        return context

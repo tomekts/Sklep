@@ -4,7 +4,12 @@
   Belka do ogarnięcia w przyszłości
 {% if  request.user.is_authenticated%}
 
-<a href="{% url 'Products:Logout' %}">wyloguj</a>{{request.user}}
+<a href="{% url 'Products:Logout' %}">wyloguj</a> {{request.user}}
+
+
+{% if request.get_full_path != '/cart/' %}
+  <a href="{% url 'Products:Cart' %}">Twoj koszyk</a>
+{% endif %}
 
 {% else %}
 

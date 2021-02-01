@@ -1,0 +1,29 @@
+{% extends 'Products/Main.html' %}
+{% block cart %}
+
+
+{{cart}}
+
+{% if products_in_cart %}
+
+{% for i in products_in_cart %}
+</p>
+{{i.ProductsId}}
+{% endfor %}
+{% else %}
+brak produktów w koszyku aktuyalnie moze dodac je tylko admin wiec go o to popros XD
+{% endif %}
+
+
+
+
+
+
+
+
+
+{% endblock %}
+
+
+
+
