@@ -2,12 +2,13 @@ from django.shortcuts import render, redirect
 from .models import Products, Category, Cart, CartProducts
 from django.contrib.auth.models import User
 from django.http import HttpResponse
+from django.http import HttpResponseRedirect
 from django.views import generic
 from django.views.generic import ListView
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
-from .forms import CreateUserForm
+from .forms import CreateUserForm, CartProductForm
 
 
 # Create your views here.
@@ -25,9 +26,29 @@ class ProductView(generic.DetailView):
     model = Products
     template_name = 'Products/Product.html'
 
+    def post(self, request, pk):
+
+        pp= CartProducts.objects.filter(CartId=Cart.objects.get(UserId=self.request.user.id), ProductsId=pk )
+        form = CartProductForm(request.POST)
+        if not pp:
+            if form.is_valid():
+                form.save()
+                messages.info(request, 'dodano produkt do koszyka')
+        else:
+            messages.info(request, 'produkt juz jest w koszyku')
+        return redirect('Products:Product',pk)
+
+
+
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['category_list'] = Category.objects.all()
+        cartId = Cart.objects.get(UserId=self.request.user.id)
+
+        context['product_in_cat'] = CartProducts.objects.filter(CartId=cartId)
+        context['cartid'] = cartId
+        context['form'] = CartProductForm(initial={'CartId': cartId, 'ProductsId':self.object.id})
         return context
 
 
@@ -67,21 +88,43 @@ class CategoryView(generic.DetailView):
 #         context = super().get_context_data(**kwargs)
 #         context['form'] = UserCreationForm
 #         return context
-def Login(request):
+# def Login(request):
+#
+#     if request.method == 'POST':
+#         username = request.POST.get('username')
+#         password = request.POST.get('password')
+#         user = authenticate(request, username=username, password=password)
+#
+#         if user is not None:
+#             login(request, user)
+#             return redirect('Products:Main')
+#         else:
+#             messages.info(request,'błedne hasło lub login')
+#
+#     context={}
+#     return render(request, 'Products/Login.html', context)
 
-    if request.method == 'POST':
+class Login(generic.TemplateView):
+    template_name = 'Products/Login.html'
+
+    def post(self, request):
+
         username = request.POST.get('username')
         password = request.POST.get('password')
+
         user = authenticate(request, username=username, password=password)
 
         if user is not None:
             login(request, user)
             return redirect('Products:Main')
         else:
-            messages.info(request,'błedne hasło lub login')
+            return render(request, 'Products/Login.html',messages.info(request,'błedne hasło lub login'))
 
-    context={}
-    return render(request, 'Products/Login.html', context)
+
+    def get_queryset(self):
+        return Category.objects.all()
+
+
 
 
 def Logout(request):
@@ -119,3 +162,5 @@ class CartView(generic.ListView):
         context['products_in_cart'] = CartProducts.objects.filter(CartId=cart_id)
         context['products'] = Products.objects.all()
         return context
+
+
