@@ -42,13 +42,14 @@ class ProductView(generic.DetailView):
 
 
     def get_context_data(self, **kwargs):
+
         context = super().get_context_data(**kwargs)
         context['category_list'] = Category.objects.all()
-        cartId = Cart.objects.get(UserId=self.request.user.id)
-
-        context['product_in_cat'] = CartProducts.objects.filter(CartId=cartId)
-        context['cartid'] = cartId
-        context['form'] = CartProductForm(initial={'CartId': cartId, 'ProductsId':self.object.id})
+        if self.request.user.is_authenticated:
+            cartId = Cart.objects.get(UserId=self.request.user.id)
+            context['product_in_cat'] = CartProducts.objects.filter(CartId=cartId)
+            context['cartid'] = cartId
+            context['form'] = CartProductForm(initial={'CartId': cartId, 'ProductsId':self.object.id})
         return context
 
 
