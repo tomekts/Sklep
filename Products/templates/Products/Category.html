@@ -1,9 +1,40 @@
 {% extends 'Products/Main.html' %}
 {% block category %}
+{% load static %}
+{% load widget_tweaks %}
 
+<h1>Kategoria: {{ category.name }}</h1>
+        {{request.choice}}
+      {% for message in messages %}
+
+					<p id="messages">{{message}}</p>
+				{% endfor %}
  {% for product in product_in_cat %}
-            <a href="{% url 'Products:Product' product.id %}">{{ product.title }}</a></p>
 
+
+            <div style="width:500px; float:left "><a href="{% url 'Products:Product' product.id %}">{{ product.title }}</a>
+
+                <div style="width:500px; float:left ">
+                    <div style="width:100px; float:left ">
+                        </p>Cena: {{ product.price }}
+                    </div>
+                    <div style="width:100px; margin-top: 15px; float:left ">
+                        <form method="POST" action="">
+                            {% csrf_token %}
+                            <input type="text" name="choice" value={{product.id}} hidden="true">
+                            {% render_field form.Count  hidden=true value='1'  %}
+                            {% render_field form.CartId hidden=true  %}
+                            {% render_field form.ProductsId  hidden=true  %}
+
+                            <input class="btn login_btn" type="submit" value="dodaj do koszyka ">
+
+                     </form>
+                    </div>
+                </div>
+            </div>
+
+            <div style="width:300px; float:right "><img src=" {%  static s %}{{product.image}}" alt="cos niedziała XD" width="100px"></p></div>
+            <div style="clear:both"></div>
         {% endfor %}
 
 {% endblock %}

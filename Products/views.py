@@ -46,7 +46,8 @@ class ProductView(generic.DetailView):
             cartId = Cart.objects.get(UserId=self.request.user.id)
             context['product_in_cat'] = CartProducts.objects.filter(CartId=cartId)
             context['cartid'] = cartId
-            context['form'] = CartProductForm(initial={'CartId': cartId, 'ProductsId':self.object.id})
+            context['form'] = CartProductForm(initial={'CartId': cartId,
+                                                       'ProductsId':self.object.id})
         return context
 
 
@@ -69,11 +70,32 @@ class CategoryView(generic.DetailView):
     template_name = 'Products/Category.html'
     context_object_name = 'category'
 
+    def post(self, request, pk):
+        form = CartProductForm(request.POST)
+        idp = request.POST.get('choice')
+        pp = CartProducts.objects.filter(CartId=Cart.objects.get(UserId=self.request.user.id), ProductsId=idp)
+
+        prod = Products.objects.get(id=idp)
+
+        if not pp:
+            if form.is_valid():
+                post = form.save(commit=False)
+                post.ProductsId =prod
+                post.save()
+                messages.info(request, 'dodano produkt')
+        else:
+            messages.info(request, 'produkt juz w koszyku')
+
+        return redirect('Products:Category',pk)
+
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        cartId = Cart.objects.get(UserId=self.request.user.id)
         context['category_list'] = Category.objects.all()
         context['product_in_cat'] = Products.objects.filter(category_id=self.object.id)
+        context['form'] = CartProductForm(initial={'CartId': cartId,
+                                                  'ProductsId': self.object.id})
         return context
 
 
@@ -125,26 +147,31 @@ class RegisterView (generic.TemplateView):
 
 
 class CartView(generic.ListView):
+    http_method_names = ['get', 'post', 'put', 'delete']
     template_name = 'Products/Cart.html'
     context_object_name = 'category_list'
 
     def post(self, request):
         cartid = request.POST.get('choice')
+
         item = CartProducts.objects.get(id=cartid)
         item.delete()
         return redirect('Products:Cart')
 
     def get_queryset(self):
-
         return Category.objects.all()
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         print(self.request.user.id)
-        cart_id,bool = Cart.objects.filter(UserId=self.request.user.id).get_or_create(defaults={'UserId': self.request.user})
+        cart_id,bool = Cart.objects.filter(UserId=self.request.user.id)\
+            .get_or_create(defaults={'UserId': self.request.user})
         context['products_in_cart'] = CartProducts.objects.filter(CartId=cart_id)
-        context['products'] = Products.objects.all()
+        # context['products'] = Products.objects.all() #ogarnąc pobieranie wsyztskiich produktów
         context['form'] = CartProductDeleteForm
         return context
+
+
+
 
 

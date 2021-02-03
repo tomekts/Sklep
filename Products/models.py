@@ -42,6 +42,8 @@ class Products(models.Model):
     image = models.ImageField(upload_to=url,null=True)
 
     def __str__(self):
+        if len(self.title)>50:
+            return self.title[:50]+'...'
         return self.title
 
     class Meta:

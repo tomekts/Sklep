@@ -1,24 +1,51 @@
 {% extends 'Products/Main.html' %}
 {% block cart %}
+{% load static %}
 
 
-{{cart}}
+
 
 {% if products_in_cart %}
-
 {% for i in products_in_cart %}
-</p>
+<div style="width:800px; float:left ">
+    <div style="width:500px; float:left ">
+        <div style="width:400px; float:left ">
+            <a href="{% url 'Products:Product' i.ProductsId.id %}">{{i.ProductsId}}</a></p>
+        Cena: {{i.ProductsId.price }}
+        </div>
 
-<a href="{% url 'Products:Product' i.ProductsId.id %}">{{i.ProductsId}}</a> Ilość: {{i.Count}}
+        <div style="width:100px; float:right ">
+            <div style=" float:left "><img src=" {%  static s %}{{i.ProductsId.image}}" alt="cos niedziała XD" width="50px"></p></div>
 
- <form method="POST" action="">
-           {% csrf_token %}
+        </div>
 
-           <input class="btn login_btn" type="submit" value="usuń ">
-      <input type="text" name="choice" value={{i.id}} hidden=True>
+    </div>
 
-        </form></p>
+    <div style="width:200px; float:left ">
+        Ilość: {{i.Count}}
+         <form method="post" action="">
+            {% csrf_token %}
+             <input class="btn login_btn" type="submit" value="usuń ">
+             <input type="text" name="choice" value={{i.id}} hidden=True>
+        </form>
+    </div>
+
+
+</div>
+<hr>
+
 {% endfor %}
+{{total}}
+<div id="demo"></div>
+<script>
+     var a = "{{products_in_cart}}";
+     console.log(a);
+    for (i in  a) {
+  console.log(i.price);
+}
+
+
+</script>
 {% else %}
 brak produktów w koszyku przejdz do produktu i dodaj go ;D
 {% endif %}
