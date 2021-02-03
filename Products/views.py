@@ -38,9 +38,6 @@ class ProductView(generic.DetailView):
             messages.info(request, 'produkt juz jest w koszyku')
         return redirect('Products:Product',pk)
 
-
-
-
     def get_context_data(self, **kwargs):
 
         context = super().get_context_data(**kwargs)
@@ -80,31 +77,6 @@ class CategoryView(generic.DetailView):
         return context
 
 
-# class LoginView(generic.ListView):
-#     model = User
-#     context_object_name = 'user'
-#     template_name = 'Products/Login.html'
-#
-#     def get_context_data(self, **kwargs):
-#         context = super().get_context_data(**kwargs)
-#         context['form'] = UserCreationForm
-#         return context
-# def Login(request):
-#
-#     if request.method == 'POST':
-#         username = request.POST.get('username')
-#         password = request.POST.get('password')
-#         user = authenticate(request, username=username, password=password)
-#
-#         if user is not None:
-#             login(request, user)
-#             return redirect('Products:Main')
-#         else:
-#             messages.info(request,'błedne hasło lub login')
-#
-#     context={}
-#     return render(request, 'Products/Login.html', context)
-
 class Login(generic.TemplateView):
     template_name = 'Products/Login.html'
 
@@ -119,33 +91,37 @@ class Login(generic.TemplateView):
             login(request, user)
             return redirect('Products:Main')
         else:
-            return render(request, 'Products/Login.html',messages.info(request,'błedne hasło lub login'))
-
+            return render(request, 'Products/Login.html',
+                          messages.info(request,'błedne hasło lub login'))
 
     def get_queryset(self):
         return Category.objects.all()
 
 
+class LogoutView(generic.TemplateView):
+    template_name = 'Products/Main.html'
+
+    def get(self,request):
+        logout(request)
+        return redirect('Products:Main')
 
 
-def Logout(request):
-    ss = request.META.get('PATH_INFO', None)
-    print(request.session)
-    logout(request)
-    print(ss)
-    return redirect('Products:Main')
 
-def Register(request):
-    form = CreateUserForm
+class RegisterView (generic.TemplateView):
+    template_name = 'Products/Register.html'
 
-    if request.method == 'POST':
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['form'] = CreateUserForm
+        return context
+
+    def post(self,request):
         form = CreateUserForm(request.POST)
         if form.is_valid():
             form.save()
             return redirect('Products:Login')
-
-    context = {'form': form}
-    return render(request, 'Products/Register.html', context)
+        context = {'form': form}
+        return render(request, 'Products/Register.html', context)
 
 
 class CartView(generic.ListView):
