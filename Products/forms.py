@@ -18,5 +18,10 @@ class CartProductForm(forms.ModelForm):
         model = CartProducts
         fields = ['Count', 'ProductsId', 'CartId']
 
+class CartProductDeleteForm(forms.ModelForm):
+    class Meta:
+        model = CartProducts
+        fields = ['CartId']
+
 
 

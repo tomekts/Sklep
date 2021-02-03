@@ -8,7 +8,7 @@ from django.views.generic import ListView
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
-from .forms import CreateUserForm, CartProductForm
+from .forms import CreateUserForm, CartProductForm, CartProductDeleteForm
 
 
 # Create your views here.
@@ -152,6 +152,12 @@ class CartView(generic.ListView):
     template_name = 'Products/Cart.html'
     context_object_name = 'category_list'
 
+    def post(self, request):
+        cartid = request.POST.get('choice')
+        item = CartProducts.objects.get(id=cartid)
+        item.delete()
+        return redirect('Products:Cart')
+
     def get_queryset(self):
 
         return Category.objects.all()
@@ -162,6 +168,7 @@ class CartView(generic.ListView):
         cart_id,bool = Cart.objects.filter(UserId=self.request.user.id).get_or_create(defaults={'UserId': self.request.user})
         context['products_in_cart'] = CartProducts.objects.filter(CartId=cart_id)
         context['products'] = Products.objects.all()
+        context['form'] = CartProductDeleteForm
         return context
 
 

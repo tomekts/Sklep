@@ -8,10 +8,19 @@
 
 {% for i in products_in_cart %}
 </p>
-{{i.ProductsId}}
+
+<a href="{% url 'Products:Product' i.ProductsId.id %}">{{i.ProductsId}}</a> Ilość: {{i.Count}}
+
+ <form method="POST" action="">
+           {% csrf_token %}
+
+           <input class="btn login_btn" type="submit" value="usuń ">
+      <input type="text" name="choice" value={{i.id}} hidden=True>
+
+        </form></p>
 {% endfor %}
 {% else %}
-brak produktów w koszyku aktuyalnie moze dodac je tylko admin wiec go o to popros XD
+brak produktów w koszyku przejdz do produktu i dodaj go ;D
 {% endif %}
 
 
