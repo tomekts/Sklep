@@ -18,16 +18,14 @@
 
 
 
-            kiedyś button dodania do koszyka tylko dla zalogowanych</p>
 
 
        <form method="POST" action="">
            {% csrf_token %}
 
-           {% render_field form.Count  value='1'  %}
-           {% render_field form.CartId hidden=True  %}
-           {% render_field form.ProductsId hidden=True  %}
-
+           {% render_field form.Count  value='1'    %}
+           {% render_field form.cart   value=cartid  hidden=true %}
+           {% render_field form.product value=object.id  hidden=true %}
            <input class="btn login_btn" type="submit" value="dodaj do koszyka">
 
         </form>

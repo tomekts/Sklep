@@ -5,10 +5,13 @@ from django.http import HttpResponse
 from django.http import HttpResponseRedirect
 from django.views import generic
 from django.views.generic import ListView
-from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.forms import UserCreationForm, PasswordChangeForm
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
+from django.contrib.auth import update_session_auth_hash
 from .forms import CreateUserForm, CartProductForm, CartProductDeleteForm
+
+
 
 
 # Create your views here.
@@ -28,10 +31,12 @@ class ProductView(generic.DetailView):
 
     def post(self, request, pk):
 
-        pp= CartProducts.objects.filter(CartId=Cart.objects.get(UserId=self.request.user.id), ProductsId=pk )
+        checkProductInCart= CartProducts.objects.filter(CartId=Cart.objects.get(UserId=self.request.user.id), ProductsId=pk )
         form = CartProductForm(request.POST)
-        if not pp:
+
+        if not checkProductInCart:
             if form.is_valid():
+                print('trs')
                 form.save()
                 messages.info(request, 'dodano produkt do koszyka')
         else:
@@ -43,11 +48,10 @@ class ProductView(generic.DetailView):
         context = super().get_context_data(**kwargs)
         context['category_list'] = Category.objects.all()
         if self.request.user.is_authenticated:
-            cartId = Cart.objects.get(UserId=self.request.user.id)
+            cartId,bool = Cart.objects.filter(UserId=self.request.user.id).get_or_create(defaults={'UserId': self.request.user})
             context['product_in_cat'] = CartProducts.objects.filter(CartId=cartId)
             context['cartid'] = cartId
-            context['form'] = CartProductForm(initial={'CartId': cartId,
-                                                       'ProductsId':self.object.id})
+            context['form'] = CartProductForm()
         return context
 
 
@@ -72,30 +76,27 @@ class CategoryView(generic.DetailView):
 
     def post(self, request, pk):
         form = CartProductForm(request.POST)
-        idp = request.POST.get('choice')
-        pp = CartProducts.objects.filter(CartId=Cart.objects.get(UserId=self.request.user.id), ProductsId=idp)
-
-        prod = Products.objects.get(id=idp)
-
-        if not pp:
+        idp = request.POST.get('product')
+        checkProductInCart = CartProducts.objects.filter(CartId=Cart.objects.get(UserId=self.request.user.id), ProductsId=idp)
+        if not checkProductInCart:
             if form.is_valid():
-                post = form.save(commit=False)
-                post.ProductsId =prod
-                post.save()
+                form.save()
                 messages.info(request, 'dodano produkt')
         else:
             messages.info(request, 'produkt juz w koszyku')
-
         return redirect('Products:Category',pk)
 
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        cartId = Cart.objects.get(UserId=self.request.user.id)
+        if self.request.user.is_authenticated:
+            cartId,bool = Cart.objects.filter(UserId=self.request.user.id).get_or_create(defaults={'UserId': self.request.user})
+            context['form'] = CartProductForm(initial={'CartId': cartId, 'ProductsId': self.object.id})
+            context['cart'] = cartId
+
         context['category_list'] = Category.objects.all()
         context['product_in_cat'] = Products.objects.filter(category_id=self.object.id)
-        context['form'] = CartProductForm(initial={'CartId': cartId,
-                                                  'ProductsId': self.object.id})
+
         return context
 
 
@@ -147,7 +148,6 @@ class RegisterView (generic.TemplateView):
 
 
 class CartView(generic.ListView):
-    http_method_names = ['get', 'post', 'put', 'delete']
     template_name = 'Products/Cart.html'
     context_object_name = 'category_list'
 
@@ -163,13 +163,42 @@ class CartView(generic.ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        print(self.request.user.id)
         cart_id,bool = Cart.objects.filter(UserId=self.request.user.id)\
             .get_or_create(defaults={'UserId': self.request.user})
         context['products_in_cart'] = CartProducts.objects.filter(CartId=cart_id)
         # context['products'] = Products.objects.all() #ogarnąc pobieranie wsyztskiich produktów
         context['form'] = CartProductDeleteForm
         return context
+
+
+class UserView(generic.TemplateView):
+    template_name = 'Products/User.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['category_list'] = Category.objects.all()
+        context['form'] = PasswordChangeForm(self.request.user)
+        return context
+
+    def post(self, request):
+        form = PasswordChangeForm(request.user, request.POST)
+
+        if form.is_valid():
+            user = form.save()
+            update_session_auth_hash(request, user)  # Important!
+            messages.success(request, 'Your password was successfully updated!')
+        else:
+             messages.info(request, 'hasło nie zostało zmienione')
+
+
+        return redirect('Products:User')
+
+
+
+
+
+
+
 
 
 

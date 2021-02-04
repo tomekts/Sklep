@@ -19,16 +19,18 @@
                         </p>Cena: {{ product.price }}
                     </div>
                     <div style="width:100px; margin-top: 15px; float:left ">
+                        {% if  request.user.is_authenticated%}
                         <form method="POST" action="">
                             {% csrf_token %}
-                            <input type="text" name="choice" value={{product.id}} hidden="true">
-                            {% render_field form.Count  hidden=true value='1'  %}
-                            {% render_field form.CartId hidden=true  %}
-                            {% render_field form.ProductsId  hidden=true  %}
+
+                            {% render_field form.Count  value='1' hidden=True   %}
+                            {% render_field form.cart   value=cart hidden=True %}
+                             {% render_field form.product value=product.id hidden=True %}
 
                             <input class="btn login_btn" type="submit" value="dodaj do koszyka ">
 
                      </form>
+                        {% endif %}
                     </div>
                 </div>
             </div>
