@@ -35,6 +35,19 @@ class CartProductDeleteForm(forms.ModelForm):
         model = CartProducts
         fields = ['CartId']
 
+class CartProductChangeCountForm(forms.ModelForm):
+    product = forms.IntegerField()
+
+    class Meta:
+        model = CartProducts
+        fields = ['Count']
+
+    def save(self, commit=True ):
+        instance = super(CartProductChangeCountForm, self).save(commit=False)
+        instance.CartId = CartProducts.objects.get(pk=self.data['product']).CartId
+        instance.Count = self.data['Count']
+        instance.save()
+
 
 
 

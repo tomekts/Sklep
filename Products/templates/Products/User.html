@@ -3,21 +3,7 @@
 
 <h1>Witaj {{request.user}}</h1>
 
+        <a href="{% url 'Products:User-password' %}">zmien hasło</a>
 
-    <form method="POST" action="">
-           {% csrf_token %}
-
-         stare  {{ form.old_password }}
-        nowe  {{ form.new_password1 }}
-      nowe   {{ form.new_password1 }}
-
-
-           <input class="btn login_btn" type="submit" value="zmień hasło">
-
-        {% for message in messages %}
-            <p id="messages">{{message}}</p>
-        {% endfor %}
-        {{form.errors}}
-        </form>
 
 {% endblock %}

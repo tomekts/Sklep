@@ -56,6 +56,16 @@ class CartProducts(models.Model):
     ProductsId = models.ForeignKey(Products, on_delete=models.CASCADE, null=True)
     Count = models.IntegerField()
 
+    def SumPrice(self):
+        return self.ProductsId.price * self.Count
+
+    def SumPriceAll(self):
+
+        return self.ProductsId.price * self.Count
+
+    def up(self):
+        return 'www'
+
 
 class Cart(models.Model):
     UserId = models.ForeignKey(User, on_delete=models.CASCADE, null=True)

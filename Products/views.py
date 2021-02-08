@@ -9,7 +9,7 @@ from django.contrib.auth.forms import UserCreationForm, PasswordChangeForm
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from django.contrib.auth import update_session_auth_hash
-from .forms import CreateUserForm, CartProductForm, CartProductDeleteForm
+from .forms import CreateUserForm, CartProductForm, CartProductDeleteForm, CartProductChangeCountForm
 
 
 
@@ -152,10 +152,19 @@ class CartView(generic.ListView):
     context_object_name = 'category_list'
 
     def post(self, request):
-        cartid = request.POST.get('choice')
+        if 'delete' in request.POST:
+            cartid = request.POST.get('delete')
+            item = CartProducts.objects.get(id=cartid)
+            item.delete()
+        if 'countChange' in request.POST:
+            item = CartProducts.objects.get(id=request.POST.get('product'))
+            form = CartProductChangeCountForm(request.POST or None, instance=item)
+            if form.is_valid():
+                form.save()
 
-        item = CartProducts.objects.get(id=cartid)
-        item.delete()
+
+
+
         return redirect('Products:Cart')
 
     def get_queryset(self):
@@ -168,11 +177,12 @@ class CartView(generic.ListView):
         context['products_in_cart'] = CartProducts.objects.filter(CartId=cart_id)
         # context['products'] = Products.objects.all() #ogarnąc pobieranie wsyztskiich produktów
         context['form'] = CartProductDeleteForm
+        context['formChange'] = CartProductChangeCountForm
         return context
 
 
-class UserView(generic.TemplateView):
-    template_name = 'Products/User.html'
+class UserChangPasswordView(generic.TemplateView):
+    template_name = 'Products/User-password.html'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -184,15 +194,24 @@ class UserView(generic.TemplateView):
         form = PasswordChangeForm(request.user, request.POST)
 
         if form.is_valid():
-            user = form.save()
-            update_session_auth_hash(request, user)  # Important!
-            messages.success(request, 'Your password was successfully updated!')
+            form.save()
+            update_session_auth_hash(request, form.user)
+            messages.success(request, 'hasło zostało zmienione')
         else:
              messages.info(request, 'hasło nie zostało zmienione')
 
 
         return redirect('Products:User')
 
+
+class UserView(generic.TemplateView):
+    template_name = 'Products/User.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['category_list'] = Category.objects.all()
+        context['form'] = PasswordChangeForm(self.request.user)
+        return context
 
 
 
