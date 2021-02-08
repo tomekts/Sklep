@@ -44,8 +44,13 @@ class CartProductChangeCountForm(forms.ModelForm):
 
     def save(self, commit=True ):
         instance = super(CartProductChangeCountForm, self).save(commit=False)
+        if int(self.data['Count']) <=0:
+            print('ponizej zera')
+            instance.Count =1
+        else:
+            instance.Count = self.data['Count']
         instance.CartId = CartProducts.objects.get(pk=self.data['product']).CartId
-        instance.Count = self.data['Count']
+
         instance.save()
 
 
