@@ -1,6 +1,10 @@
-from django.urls import path
+from django.urls import path, include
 from Products.views import *
 from . import views
+from rest_framework import routers
+
+
+
 
 app_name = 'Products'
 urlpatterns = [
@@ -15,6 +19,7 @@ urlpatterns = [
     path('cart/', views.CartView.as_view(), name='Cart'),
     path('user/password/', views.UserChangPasswordView.as_view(), name='User-password'),
     path('user/', views.UserView.as_view(), name='User'),
+
 
 
 ]

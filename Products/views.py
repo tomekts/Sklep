@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from .models import Products, Category, Cart, CartProducts
+from .models import Products, Category, Cart, CartProducts, Producer
 from django.contrib.auth.models import User
 from django.http import HttpResponse
 from django.http import HttpResponseRedirect
@@ -10,6 +10,9 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from django.contrib.auth import update_session_auth_hash
 from .forms import CreateUserForm, CartProductForm,  CartProductChangeCountForm
+from rest_framework import viewsets
+from rest_framework import permissions
+from .serializers import UserSerializer, ProductsSerializer, CategorySerializer, CartSerializer, CartProductsSerializer, ProducerSerializer
 
 
 
@@ -129,7 +132,6 @@ class LogoutView(generic.TemplateView):
         return redirect('Products:Main')
 
 
-
 class RegisterView (generic.TemplateView):
     template_name = 'Products/Register.html'
 
@@ -207,6 +209,59 @@ class UserView(generic.TemplateView):
         context['category_list'] = Category.objects.all()
         context['form'] = PasswordChangeForm(self.request.user)
         return context
+
+
+class UserViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows users to be viewed or edited.
+    """
+    queryset = User.objects.all().order_by('-date_joined')
+    serializer_class = UserSerializer
+    permission_classes = [permissions.IsAdminUser]
+
+
+class ProductsViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows users to be viewed or edited.
+    """
+    queryset = Products.objects.all()
+    serializer_class = ProductsSerializer
+    permission_classes = [permissions.IsAdminUser]
+
+
+class CategoryViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows users to be viewed or edited.
+    """
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
+    permission_classes = [permissions.IsAdminUser]
+
+
+class ProducerViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows users to be viewed or edited.
+    """
+    queryset = Producer.objects.all()
+    serializer_class = ProducerSerializer
+    permission_classes = [permissions.IsAdminUser]
+
+
+class CartProductsViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows users to be viewed or edited.
+    """
+    queryset = CartProducts.objects.all()
+    serializer_class = CartProductsSerializer
+    permission_classes = [permissions.IsAdminUser]
+
+class CartViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows users to be viewed or edited.
+    """
+    queryset = Cart.objects.all()
+    serializer_class = CartSerializer
+    permission_classes = [permissions.IsAdminUser]
 
 
 
