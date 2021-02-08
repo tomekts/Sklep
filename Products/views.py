@@ -9,7 +9,7 @@ from django.contrib.auth.forms import UserCreationForm, PasswordChangeForm
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from django.contrib.auth import update_session_auth_hash
-from .forms import CreateUserForm, CartProductForm, CartProductDeleteForm, CartProductChangeCountForm
+from .forms import CreateUserForm, CartProductForm,  CartProductChangeCountForm
 
 
 
@@ -161,10 +161,6 @@ class CartView(generic.ListView):
             form = CartProductChangeCountForm(request.POST or None, instance=item)
             if form.is_valid():
                 form.save()
-
-
-
-
         return redirect('Products:Cart')
 
     def get_queryset(self):
@@ -175,9 +171,8 @@ class CartView(generic.ListView):
         cart_id,bool = Cart.objects.filter(UserId=self.request.user.id)\
             .get_or_create(defaults={'UserId': self.request.user})
         context['products_in_cart'] = CartProducts.objects.filter(CartId=cart_id)
-        # context['products'] = Products.objects.all() #ogarnąc pobieranie wsyztskiich produktów
-        context['form'] = CartProductDeleteForm
         context['formChange'] = CartProductChangeCountForm
+        context['cart'] = Cart
         return context
 
 

@@ -7,7 +7,7 @@
 
 
 {% if products_in_cart %}
-{{ products_in_cart.up }}
+
 {% for i in products_in_cart %}
 <div style="width:800px; float:left ">
     <div style="width:500px; float:left ">
@@ -34,6 +34,7 @@
              <input type="submit" value="przelicz" name="countChange" >
              <input type="text" name="count" hidden=True></p>
              łączna kwota: {{i.SumPrice}}
+
         </form>
 
          <form method="post" name="del" action="">
@@ -46,9 +47,13 @@
 
 </div>
 <hr>
+{% for i in products_in_cart %}
 
 {% endfor %}
+{% endfor %}
 
+
+Suma całego koszyka {{products_in_cart.0.SumPriceAll}}
 
 
 {% else %}

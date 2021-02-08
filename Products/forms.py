@@ -30,11 +30,6 @@ class CartProductForm(forms.ModelForm):
         instance.save()
 
 
-class CartProductDeleteForm(forms.ModelForm):
-    class Meta:
-        model = CartProducts
-        fields = ['CartId']
-
 class CartProductChangeCountForm(forms.ModelForm):
     product = forms.IntegerField()
 

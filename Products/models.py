@@ -60,8 +60,11 @@ class CartProducts(models.Model):
         return self.ProductsId.price * self.Count
 
     def SumPriceAll(self):
-
-        return self.ProductsId.price * self.Count
+        sum=0
+        Listprod=CartProducts.objects.filter(CartId= self.CartId)
+        for i in Listprod:
+            sum += i.Count * i.ProductsId.price
+        return sum
 
     def up(self):
         return 'www'
