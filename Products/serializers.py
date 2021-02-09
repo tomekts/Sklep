@@ -12,7 +12,7 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
 class ProductsSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Products
-        fields = [ 'url', 'category', 'producer', 'title', 'description', 'price', 'image']
+        fields = ['url', 'category', 'producer', 'title', 'description', 'price', 'image']
 
 
 class CategorySerializer(serializers.HyperlinkedModelSerializer):
@@ -24,7 +24,7 @@ class CategorySerializer(serializers.HyperlinkedModelSerializer):
 class ProducerSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Producer
-        fields = ['name', 'description']
+        fields = ['name', 'description', 'image']
 
 
 class CartProductsSerializer(serializers.HyperlinkedModelSerializer):
@@ -36,4 +36,4 @@ class CartProductsSerializer(serializers.HyperlinkedModelSerializer):
 class CartSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Cart
-        fields = ['pk', 'UserId']
+        fields = ['url', 'UserId']

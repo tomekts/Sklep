@@ -7,6 +7,7 @@
 <div style="width:300px; float:left " >
     <h1>{{ object.title }}</h1>
 
+
     KAtegoria: {{ object.category }}</p>
     Producent: <a href="{% url 'Products:Producer' object.producer.id  %}">{{ object.producer }}</a></p>
 
@@ -43,7 +44,7 @@
     </div>
     <div style="width:200px; float:left  ">
 
-    <img src=" {%  static s %}{{object.image}}" alt="cos niedziała XD" width="300px">
+    <img src=" {{object.image.url}}" alt="cos niedziała XD" width="300px">
 
     </div>
 

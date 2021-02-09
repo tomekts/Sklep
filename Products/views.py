@@ -14,9 +14,8 @@ from rest_framework import viewsets
 from rest_framework import permissions
 from .serializers import UserSerializer, ProductsSerializer, CategorySerializer, CartSerializer, CartProductsSerializer, ProducerSerializer
 
-
-
 # Create your views here.
+
 
 class ProducerView(generic.DetailView):
     template_name = 'Products/Producer.html'
@@ -28,7 +27,6 @@ class ProducerView(generic.DetailView):
         context = super().get_context_data(**kwargs)
         context['category_list'] = Category.objects.all()
         return context
-
 
 
 class ProductView(generic.DetailView):
