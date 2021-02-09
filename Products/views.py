@@ -16,16 +16,19 @@ from .serializers import UserSerializer, ProductsSerializer, CategorySerializer,
 
 
 
-
 # Create your views here.
 
+class ProducerView(generic.DetailView):
+    template_name = 'Products/Producer.html'
+    context_object_name = 'producer_list'
+    model = Producer
 
-class ProductsView(generic.ListView):
-    template_name = 'Products/Products.html'
-    context_object_name = 'product_list'
+    def get_context_data(self, **kwargs):
 
-    def get_queryset(self):
-        return Products.objects.all()
+        context = super().get_context_data(**kwargs)
+        context['category_list'] = Category.objects.all()
+        return context
+
 
 
 class ProductView(generic.DetailView):

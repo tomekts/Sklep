@@ -1,0 +1,23 @@
+{% extends 'Products/Main.html' %}
+{% block cart %}
+{% load static %}
+
+
+<h1>{{object.name}}</h1>
+<div style="width:800px; float:left ">
+    <div style="width:300px; float:left ">
+        {{object.description}}
+    </div>
+
+    <div style="width:300px; float:left ">
+        {% if  object.image%}
+        <img src=" {%  static s %}{{object.image}}" alt="cos niedziała XD" width="300px">
+        {%  endif%}
+    </div>
+
+</div>
+{% endblock %}
+
+
+
+

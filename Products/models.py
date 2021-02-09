@@ -6,8 +6,12 @@ import os
 
 
 class Producer(models.Model):
+    def urla(self, filename):
+        return os.path.join('images/logo/', filename)
+
     name = models.CharField(max_length=50)
     description = models.TextField(blank=True)
+    image = models.ImageField(upload_to=urla, null=True)
 
     def __str__(self):
         return self.name
@@ -15,6 +19,8 @@ class Producer(models.Model):
     class Meta:
         verbose_name = 'Producent'
         verbose_name_plural = 'Producenci'
+
+
 
 
 class Category(models.Model):
@@ -31,7 +37,6 @@ class Category(models.Model):
 class Products(models.Model):
 
     def urla(self, filename):
-
         return os.path.join('images/', filename)
 
     category = models.ForeignKey(Category, on_delete=models.CASCADE, null=True)

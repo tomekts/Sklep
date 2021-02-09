@@ -8,7 +8,8 @@
     <h1>{{ object.title }}</h1>
 
     KAtegoria: {{ object.category }}</p>
-    Producent: {{ object.producer }}</p>
+    Producent: <a href="{% url 'Products:Producer' object.producer.id  %}">{{ object.producer }}</a></p>
+
 
     Opis:{{ object.description }}</p>
     cena:{{ object.price }}</p>
