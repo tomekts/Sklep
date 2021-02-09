@@ -30,7 +30,7 @@ class Category(models.Model):
 
 class Products(models.Model):
 
-    def url(self, filename):
+    def urla(self, filename):
 
         return os.path.join('images/', filename)
 
@@ -39,7 +39,7 @@ class Products(models.Model):
     title = models.CharField(max_length=100)
     description = models.TextField(blank=True)
     price = models.DecimalField(max_digits=12, decimal_places=2)
-    image = models.ImageField(upload_to=url,null=True)
+    image = models.ImageField(upload_to=urla,null=True)
 
     def __str__(self):
         if len(self.title)>50:
