@@ -14,6 +14,7 @@ from rest_framework import viewsets
 from rest_framework import permissions
 from .serializers import UserSerializer, ProductsSerializer, CategorySerializer, CartSerializer, CartProductsSerializer, ProducerSerializer
 from django.core.paginator import Paginator, EmptyPage
+from .filters import ProductFilter
 # Create your views here.
 
 
@@ -103,13 +104,16 @@ class CategoryView(generic.ListView):
         context['category_list'] = Category.objects.all()
         # context['product_in_cat'] = Products.objects.filter(category_id=self.kwargs.get('pk'))
         product = Products.objects.filter(category_id=self.kwargs.get('pk'))
+        product2 = ProductFilter(self.request.GET, queryset=product)
+
         page_num = self.request.GET.get('page',1)
-        pag = Paginator(product,2)
+        pag = Paginator(product,4)
         try:
             page = pag.page(page_num)
         except:
             page=pag.page(1)
-        context['product_in_cat'] = page
+
+        context['product_in_cat'] = product2
         return context
 
 

@@ -9,16 +9,21 @@
 
 					<p id="messages">{{message}}</p>
 				{% endfor %}
- {% for product in product_in_cat %}
+cena /\ cena\/ nazwa<p></p>
+<form method="GET">
+    {{product_in_cat.form.ordering}}
+    <input class="btn login_btn" type="submit" value="dodaj do koszyka ">
+
+</form>
+
+ {% for product in product_in_cat.qs %}
 
 
 
             <div style="width:500px; float:left "><a href="{% url 'Products:Product' product.id %}">{{ product.title }}</a>
 
                 <div style="width:500px; float:left ">
-                    <div style="width:100px; float:left ">
-                        </p>Cena: {{ product.price }}
-                    </div>
+
                     <div style="width:100px; margin-top: 15px; float:left ">
                         {% if  request.user.is_authenticated%}
                         <form method="POST" action="">
@@ -35,8 +40,10 @@
                     </div>
                 </div>
             </div>
-
-            <div style="width:300px; float:right "><img src=" {{product.image.url}}" alt="cos niedziała XD" height="90px"></p></div>
+             <div style="width:200px; float:left ">
+                        </p>Cena: {{ product.price }}
+             </div>
+            <div style="width:100px; float:right "><img src=" {{product.image.url}}" alt="cos niedziała XD" height="100px"></p></div>
             <div style="clear:both"></div>
 
         {% endfor %}
