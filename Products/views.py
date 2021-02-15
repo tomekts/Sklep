@@ -34,27 +34,26 @@ class ProductView(generic.DetailView):
     template_name = 'Products/Product.html'
 
     def post(self, request, pk):
-
-        checkProductInCart= CartProducts.objects.filter(CartId=Cart.objects.get(UserId=self.request.user.id), ProductsId=pk )
+        cart_id_user = Cart.objects.get(UserId=self.request.user.id)
+        check_product_in_cart= CartProducts.objects.filter(CartId=cart_id_user, ProductsId=pk)
         form = CartProductForm(request.POST)
 
-        if not checkProductInCart:
+        if not check_product_in_cart:
             if form.is_valid():
-                print('trs')
                 form.save()
                 messages.info(request, 'dodano produkt do koszyka')
         else:
             messages.info(request, 'produkt juz jest w koszyku')
-        return redirect('Products:Product',pk)
+        return redirect('Products:Product', pk)
 
     def get_context_data(self, **kwargs):
 
         context = super().get_context_data(**kwargs)
         context['category_list'] = Category.objects.all()
         if self.request.user.is_authenticated:
-            cartId,bool = Cart.objects.filter(UserId=self.request.user.id).get_or_create(defaults={'UserId': self.request.user})
-            context['product_in_cat'] = CartProducts.objects.filter(CartId=cartId)
-            context['cartid'] = cartId
+            cart_id, bool = Cart.objects.filter(UserId=self.request.user.id).get_or_create(defaults={'UserId': self.request.user})
+            context['product_in_cat'] = CartProducts.objects.filter(CartId=cart_id)
+            context['cartid'] = cart_id
             context['form'] = CartProductForm()
         return context
 
@@ -80,23 +79,24 @@ class CategoryView(generic.DetailView):
 
     def post(self, request, pk):
         form = CartProductForm(request.POST)
-        idp = request.POST.get('product')
-        checkProductInCart = CartProducts.objects.filter(CartId=Cart.objects.get(UserId=self.request.user.id), ProductsId=idp)
-        if not checkProductInCart:
+        id_product = request.POST.get('product')
+        cart_id_user = Cart.objects.get(UserId=self.request.user.id)
+        check_product_in_cart = CartProducts.objects.filter(CartId=cart_id_user, ProductsId=id_product)
+        if not check_product_in_cart:
             if form.is_valid():
                 form.save()
                 messages.info(request, 'dodano produkt')
         else:
             messages.info(request, 'produkt juz w koszyku')
-        return redirect('Products:Category',pk)
+        return redirect('Products:Category', pk)
 
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         if self.request.user.is_authenticated:
-            cartId,bool = Cart.objects.filter(UserId=self.request.user.id).get_or_create(defaults={'UserId': self.request.user})
-            context['form'] = CartProductForm(initial={'CartId': cartId, 'ProductsId': self.object.id})
-            context['cart'] = cartId
+            cart_id, bool = Cart.objects.filter(UserId=self.request.user.id).get_or_create(defaults={'UserId': self.request.user})
+            context['form'] = CartProductForm(initial={'CartId': cart_id, 'ProductsId': self.object.id})
+            context['cart'] = cart_id
 
         context['category_list'] = Category.objects.all()
         context['product_in_cat'] = Products.objects.filter(category_id=self.object.id)
@@ -119,7 +119,7 @@ class Login(generic.TemplateView):
             return redirect('Products:Main')
         else:
             return render(request, 'Products/Login.html',
-                          messages.info(request,'błedne hasło lub login'))
+                          messages.info(request, 'błedne hasło lub login'))
 
     def get_queryset(self):
         return Category.objects.all()
@@ -128,7 +128,7 @@ class Login(generic.TemplateView):
 class LogoutView(generic.TemplateView):
     template_name = 'Products/Main.html'
 
-    def get(self,request):
+    def get(self, request):
         logout(request)
         return redirect('Products:Main')
 
@@ -156,8 +156,8 @@ class CartView(generic.ListView):
 
     def post(self, request):
         if 'delete' in request.POST:
-            cartid = request.POST.get('delete')
-            item = CartProducts.objects.get(id=cartid)
+            cart_id = request.POST.get('delete')
+            item = CartProducts.objects.get(id=cart_id)
             item.delete()
         if 'countChange' in request.POST:
             item = CartProducts.objects.get(id=request.POST.get('product'))
@@ -171,7 +171,7 @@ class CartView(generic.ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        cart_id,bool = Cart.objects.filter(UserId=self.request.user.id)\
+        cart_id, bool = Cart.objects.filter(UserId=self.request.user.id)\
             .get_or_create(defaults={'UserId': self.request.user})
         context['products_in_cart'] = CartProducts.objects.filter(CartId=cart_id)
         context['formChange'] = CartProductChangeCountForm
@@ -227,7 +227,7 @@ class ProductsViewSet(viewsets.ModelViewSet):
     """
     queryset = Products.objects.all()
     serializer_class = ProductsSerializer
-    permission_classes = [permissions.IsAdminUser]
+    #permission_classes = [permissions.IsAdminUser]
 
 
 class CategoryViewSet(viewsets.ModelViewSet):
@@ -236,7 +236,7 @@ class CategoryViewSet(viewsets.ModelViewSet):
     """
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
-    permission_classes = [permissions.IsAdminUser]
+    #permission_classes = [permissions.IsAdminUser]
 
 
 class ProducerViewSet(viewsets.ModelViewSet):
@@ -245,7 +245,7 @@ class ProducerViewSet(viewsets.ModelViewSet):
     """
     queryset = Producer.objects.all()
     serializer_class = ProducerSerializer
-    permission_classes = [permissions.IsAdminUser]
+    #permission_classes = [permissions.IsAdminUser]
 
 
 class CartProductsViewSet(viewsets.ModelViewSet):
@@ -254,7 +254,7 @@ class CartProductsViewSet(viewsets.ModelViewSet):
     """
     queryset = CartProducts.objects.all()
     serializer_class = CartProductsSerializer
-    permission_classes = [permissions.IsAdminUser]
+    #permission_classes = [permissions.IsAdminUser]
 
 class CartViewSet(viewsets.ModelViewSet):
     """
@@ -262,7 +262,7 @@ class CartViewSet(viewsets.ModelViewSet):
     """
     queryset = Cart.objects.all()
     serializer_class = CartSerializer
-    permission_classes = [permissions.IsAdminUser]
+    #permission_classes = [permissions.IsAdminUser]
 
 
 
