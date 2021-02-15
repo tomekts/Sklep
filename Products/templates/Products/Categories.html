@@ -1,6 +1,6 @@
 
     {% for category in category_list %}
-            <a href="{% url 'Products:Category' category.id  %}">{{ category.name }}</a></p>
+            <a href="{% url 'Products:Category' category.id  %}?page=1">{{ category.name }}</a></p>
 
         {% endfor %}
 

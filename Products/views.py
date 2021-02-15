@@ -13,7 +13,7 @@ from .forms import CreateUserForm, CartProductForm,  CartProductChangeCountForm
 from rest_framework import viewsets
 from rest_framework import permissions
 from .serializers import UserSerializer, ProductsSerializer, CategorySerializer, CartSerializer, CartProductsSerializer, ProducerSerializer
-
+from django.core.paginator import Paginator, EmptyPage
 # Create your views here.
 
 
@@ -72,16 +72,18 @@ class CategoriesView(generic.ListView):
         return Category.objects.all()
 
 
-class CategoryView(generic.DetailView):
+class CategoryView(generic.ListView):
     model = Category
     template_name = 'Products/Category.html'
     context_object_name = 'category'
+
 
     def post(self, request, pk):
         form = CartProductForm(request.POST)
         id_product = request.POST.get('product')
         cart_id_user = Cart.objects.get(UserId=self.request.user.id)
         check_product_in_cart = CartProducts.objects.filter(CartId=cart_id_user, ProductsId=id_product)
+        paginate_by = 2
         if not check_product_in_cart:
             if form.is_valid():
                 form.save()
@@ -95,12 +97,19 @@ class CategoryView(generic.DetailView):
         context = super().get_context_data(**kwargs)
         if self.request.user.is_authenticated:
             cart_id, bool = Cart.objects.filter(UserId=self.request.user.id).get_or_create(defaults={'UserId': self.request.user})
-            context['form'] = CartProductForm(initial={'CartId': cart_id, 'ProductsId': self.object.id})
+            context['form'] = CartProductForm(initial={'CartId': cart_id, 'ProductsId': self.kwargs.get('pk')})
             context['cart'] = cart_id
 
         context['category_list'] = Category.objects.all()
-        context['product_in_cat'] = Products.objects.filter(category_id=self.object.id)
-
+        # context['product_in_cat'] = Products.objects.filter(category_id=self.kwargs.get('pk'))
+        product = Products.objects.filter(category_id=self.kwargs.get('pk'))
+        page_num = self.request.GET.get('page',1)
+        pag = Paginator(product,2)
+        try:
+            page = pag.page(page_num)
+        except:
+            page=pag.page(1)
+        context['product_in_cat'] = page
         return context
 
 
