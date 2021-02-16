@@ -104,16 +104,17 @@ class CategoryView(generic.ListView):
         context['category_list'] = Category.objects.all()
         # context['product_in_cat'] = Products.objects.filter(category_id=self.kwargs.get('pk'))
         product = Products.objects.filter(category_id=self.kwargs.get('pk'))
-        product2 = ProductFilter(self.request.GET, queryset=product)
+        product_filter = ProductFilter(self.request.GET, queryset=product)
 
-        page_num = self.request.GET.get('page',1)
-        pag = Paginator(product,4)
+        pag = Paginator(product_filter.qs, 4)
+        page_num = self.request.GET.get('page', 1)
         try:
             page = pag.page(page_num)
         except:
             page=pag.page(1)
 
-        context['product_in_cat'] = product2
+        context['product_filter'] = product_filter
+        context['product_pagination'] = page
         return context
 
 

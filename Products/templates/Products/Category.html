@@ -2,6 +2,7 @@
 {% block category %}
 {% load static %}
 {% load widget_tweaks %}
+{% load product_extras %}
 
 <h1>Kategoria: {{ category.name }}</h1>
         {{request.choice}}
@@ -9,14 +10,16 @@
 
 					<p id="messages">{{message}}</p>
 				{% endfor %}
+
+my url{% my_url 1 'page'  request.GET.urlencode %}<p></p>
 cena /\ cena\/ nazwa<p></p>
 <form method="GET">
-    {{product_in_cat.form.ordering}}
-    <input class="btn login_btn" type="submit" value="dodaj do koszyka ">
+    {{product_filter.form.ordering}}
+    <input class="btn login_btn" type="submit" value="filtrowanie ">
 
 </form>
 
- {% for product in product_in_cat.qs %}
+ {% for product in product_pagination %}
 
 
 
@@ -47,13 +50,16 @@ cena /\ cena\/ nazwa<p></p>
             <div style="clear:both"></div>
 
         {% endfor %}
- {% if product_in_cat.has_previous %}
-            <a href="?page=1"> first</a>
-            <a href="?page={{ product_in_cat.previous_page_number }}">previous</a>
+ {% if product_pagination.has_previous %}
+            <a href="{% my_url 1 'page'  request.GET.urlencode %}"> first</a>
+            <a href="{% my_url product_pagination.previous_page_number 'page'  request.GET.urlencode %}">previous</a>
+<!--            <a href="?page={{ product_pagination.previous_page_number }}">previous</a>-->
         {% endif %}
-{% if product_in_cat.has_next %}
-            <a href="?page={{ product_in_cat.next_page_number }}">next</a>
-            <a href="?page={{ product_in_cat.paginator.num_pages }}">last </a>
+{% if product_pagination.has_next %}
+            <a href="{% my_url product_pagination.next_page_number 'page'  request.GET.urlencode %}">next</a>
+<!--            <a href="?page={{ product_pagination.next_page_number }}">next</a>-->
+            <a href="{% my_url product_pagination.paginator.num_pages 'page'  request.GET.urlencode %}">last</a>
+<!--            <a href="?page={{ product_pagination.paginator.num_pages }}">last </a>-->
         {% endif %}
 
 {% endblock %}
