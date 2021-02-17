@@ -1,10 +1,16 @@
 {% extends 'Products/Main.html' %}
 {% block user %}
+{% for message in messages %}
+            <p id="messages">{{message}}</p>
+        {% endfor %}
+<h1>Witaj {{user}}</h1>
 
-<h1>Witaj {{request.user}}</h1>
+        <form method="post">
+            {% csrf_token %}
+            {{form.as_p}}
+            <input type="submit" value="zapisz">
+            {{errors}}
+        </form>
 
-        Twój.email {{request.user.email}}<p></p>
-        <a href="{% url 'Products:User-password' %}">zmien hasło</a>
-
-
+         Aby zmienic hasło przejdz <a href="{% url 'Products:User-password' %}">Tutaj</a>
 {% endblock %}

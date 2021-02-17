@@ -5,17 +5,16 @@ from django.http import HttpResponse
 from django.http import HttpResponseRedirect
 from django.views import generic
 from django.views.generic import ListView
-from django.contrib.auth.forms import UserCreationForm, PasswordChangeForm
+from django.contrib.auth.forms import PasswordChangeForm, UserChangeForm
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from django.contrib.auth import update_session_auth_hash
-from .forms import CreateUserForm, CartProductForm,  CartProductChangeCountForm
+from .forms import CreateUserForm, CartProductForm, CartProductChangeCountForm, EditProfilForm
 from rest_framework import viewsets
 from rest_framework import permissions
 from .serializers import UserSerializer, ProductsSerializer, CategorySerializer, CartSerializer, CartProductsSerializer, ProducerSerializer
-from django.core.paginator import Paginator, EmptyPage
+from django.core.paginator import Paginator
 from .filters import ProductFilter
-from django.template.loader import get_template
 from django.template.loader import render_to_string
 from django.core.mail import send_mail, EmailMultiAlternatives
 # Create your views here.
@@ -249,10 +248,20 @@ class UserChangPasswordView(generic.TemplateView):
 class UserView(generic.TemplateView):
     template_name = 'Products/User.html'
 
+    def post(self, request):
+
+        form = EditProfilForm(request.POST, instance=request.user)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Dane zostały zapisane')
+        else:
+            messages.success(request, 'Błąd zapisu danych')
+        return redirect('Products:User')
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['category_list'] = Category.objects.all()
-        context['form'] = PasswordChangeForm(self.request.user)
+        context['form'] = EditProfilForm(instance=self.request.user)
         return context
 
 
