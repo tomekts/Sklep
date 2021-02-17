@@ -71,9 +71,6 @@ class CartProducts(models.Model):
             sum += i.Count * i.ProductsId.price
         return sum
 
-    def up(self):
-        return 'www'
-
 
 class Cart(models.Model):
     UserId = models.ForeignKey(User, on_delete=models.CASCADE, null=True)

@@ -6,8 +6,8 @@ class ProductFilter(django_filters.FilterSet):
 
 
     CHOICES=(
-        ('ros', 'Rosnoco cena'),
-        ('mal', 'Malejąco cena')
+        ('asc', 'Cena - od najniższej'),
+        ('dsc', 'Cena - od najwyższej')
     )
 
     ordering = django_filters.ChoiceFilter(label='bla', choices=CHOICES, method='filter_b')
@@ -19,5 +19,5 @@ class ProductFilter(django_filters.FilterSet):
         }
 
     def filter_b(self, queryset, name, value):
-        expresion = 'price' if value == 'ros' else '-price'
+        expresion = 'price' if value == 'asc' else '-price'
         return queryset.order_by(expresion)

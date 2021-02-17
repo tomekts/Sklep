@@ -7,67 +7,63 @@
 
 
 {% if products_in_cart %}
+    <form method="post" name="send" action="">
+        {% csrf_token %}
+        <input type="submit" name=send value="wyslij swój koszyk na email ">
+        <input type="email" name="mail" value={{request.user.email}}>
 
-{% for i in products_in_cart %}
-<div style="width:800px; float:left ">
-    <div style="width:500px; float:left ">
-        <div style="width:400px; float:left ">
-            <a href="{% url 'Products:Product' i.ProductsId.id %}">{{i.ProductsId}}</a></p>
-        Cena: {{i.ProductsId.price }}
+    </form>
+
+
+    {% for i in products_in_cart %}
+        <div style="width:800px; float:left ">
+            <div style="width:500px; float:left ">
+                <div style="width:400px; float:left ">
+                    <a href="{% url 'Products:Product' i.ProductsId.id %}">{{i.ProductsId}}</a></p>
+                Cena: {{i.ProductsId.price }}
+
+                </div>
+
+                <div style="width:100px; float:right ">
+                    <div style=" float:left "><img src=" {{i.ProductsId.image.url}}" alt="cos niedziała XD" width="50px"></p></div>
+
+                </div>
+
+            </div>
+
+            <div style="width:200px; float:left ">
+
+
+                 <form method="post" name="countChange" action="">
+                     {% csrf_token %}
+                   Ilosc: {% render_field formChange.Count  value=i.Count    %}
+                     {% render_field formChange.product value=i.id hidden=True %}
+                     <input type="submit" value="przelicz" name="countChange" >
+                     </p>
+                     łączna kwota: {{i.SumPrice}}
+
+                </form>
+
+                 <form method="post" name="del" action="">
+                    {% csrf_token %}
+                     <input type="submit" value="usuń ">
+                     <input type="text" name="delete" value={{i.id}} hidden=True>
+                </form>
+            </div>
+
 
         </div>
+        <hr>
 
-        <div style="width:100px; float:right ">
-            <div style=" float:left "><img src=" {{i.ProductsId.image.url}}" alt="cos niedziała XD" width="50px"></p></div>
-
-        </div>
-
-    </div>
-
-    <div style="width:200px; float:left ">
+    {% endfor %}
 
 
-         <form method="post" name="countChange" action="">
-             {% csrf_token %}
-           Ilosc: {% render_field formChange.Count  value=i.Count    %}
-             {% render_field formChange.product value=i.id hidden=True %}
-             <input type="submit" value="przelicz" name="countChange" >
-             <input type="text" name="count" hidden=True></p>
-             łączna kwota: {{i.SumPrice}}
-
-        </form>
-
-         <form method="post" name="del" action="">
-            {% csrf_token %}
-             <input type="submit" value="usuń ">
-             <input type="text" name="delete" value={{i.id}} hidden=True>
-        </form>
-    </div>
-
-
-</div>
-<hr>
-{% for i in products_in_cart %}
-
-{% endfor %}
-{% endfor %}
-
-
-Suma całego koszyka {{products_in_cart.0.SumPriceAll}}
+    Suma całego koszyka {{products_in_cart.0.SumPriceAll}}
 
 
 {% else %}
-brak produktów w koszyku przejdz do produktu i dodaj go ;D
+    brak produktów w koszyku przejdz do produktu i dodaj go ;D
 {% endif %}
-
-
-
-
-
-
-
-
-
 {% endblock %}
 
 

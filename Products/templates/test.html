@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+</head>
+<body>
+<h1>Twój koszyk {{request.user}}</h1>
+ {% for i in cart %}
+    <div>{{ i.ProductsId.title }} Cena: {{i.ProductsId.price }} Ilość: {{i.Count }}</div>
+ {% endfor %}
+Łączna Kwota  {{cart.0.SumPriceAll}}
+</body>
+</html>

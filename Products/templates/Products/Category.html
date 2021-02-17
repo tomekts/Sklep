@@ -4,18 +4,18 @@
 {% load widget_tweaks %}
 {% load product_extras %}
 
-<h1>Kategoria: {{ category.name }}</h1>
-        {{request.choice}}
-      {% for message in messages %}
+<h1>Kategoria: {{ object }}</h1>
 
-					<p id="messages">{{message}}</p>
-				{% endfor %}
+        {% for message in messages %}
+            <p id="messages">{{message}}</p>
+        {% endfor %}
 
-my url{% my_url 1 'page'  request.GET.urlencode %}<p></p>
-cena /\ cena\/ nazwa<p></p>
+<a href="{% my_url 'asc' 'ordering'  request.GET.urlencode %}"> Cena /\</a>
+<a href="{% my_url 'dsc' 'ordering'  request.GET.urlencode %}"> Cena \/</a>
+
 <form method="GET">
     {{product_filter.form.ordering}}
-    <input class="btn login_btn" type="submit" value="filtrowanie ">
+    <input class="btn login_btn" type="submit" value="sortuj ">
 
 </form>
 
@@ -51,15 +51,12 @@ cena /\ cena\/ nazwa<p></p>
 
         {% endfor %}
  {% if product_pagination.has_previous %}
-            <a href="{% my_url 1 'page'  request.GET.urlencode %}"> first</a>
-            <a href="{% my_url product_pagination.previous_page_number 'page'  request.GET.urlencode %}">previous</a>
-<!--            <a href="?page={{ product_pagination.previous_page_number }}">previous</a>-->
+            <a href="{% my_url 1 'page'  request.GET.urlencode %}"> 1</a>
+            <a href="{% my_url product_pagination.previous_page_number 'page'  request.GET.urlencode %}">< Strona</a>
         {% endif %}
 {% if product_pagination.has_next %}
-            <a href="{% my_url product_pagination.next_page_number 'page'  request.GET.urlencode %}">next</a>
-<!--            <a href="?page={{ product_pagination.next_page_number }}">next</a>-->
-            <a href="{% my_url product_pagination.paginator.num_pages 'page'  request.GET.urlencode %}">last</a>
-<!--            <a href="?page={{ product_pagination.paginator.num_pages }}">last </a>-->
+            <a href="{% my_url product_pagination.next_page_number 'page'  request.GET.urlencode %}"> Strona ></a>
+            <a href="{% my_url product_pagination.paginator.num_pages 'page'  request.GET.urlencode %}">{{product_pagination.paginator.num_pages}}</a>
         {% endif %}
 
 {% endblock %}

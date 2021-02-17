@@ -15,6 +15,9 @@ from rest_framework import permissions
 from .serializers import UserSerializer, ProductsSerializer, CategorySerializer, CartSerializer, CartProductsSerializer, ProducerSerializer
 from django.core.paginator import Paginator, EmptyPage
 from .filters import ProductFilter
+from django.template.loader import get_template
+from django.template.loader import render_to_string
+from django.core.mail import send_mail, EmailMultiAlternatives
 # Create your views here.
 
 
@@ -24,7 +27,6 @@ class ProducerView(generic.DetailView):
     model = Producer
 
     def get_context_data(self, **kwargs):
-
         context = super().get_context_data(**kwargs)
         context['category_list'] = Category.objects.all()
         return context
@@ -33,6 +35,7 @@ class ProducerView(generic.DetailView):
 class ProductView(generic.DetailView):
     model = Products
     template_name = 'Products/Product.html'
+
 
     def post(self, request, pk):
         cart_id_user = Cart.objects.get(UserId=self.request.user.id)
@@ -73,7 +76,7 @@ class CategoriesView(generic.ListView):
         return Category.objects.all()
 
 
-class CategoryView(generic.ListView):
+class CategoryView(generic.DetailView):
     model = Category
     template_name = 'Products/Category.html'
     context_object_name = 'category'
@@ -112,7 +115,7 @@ class CategoryView(generic.ListView):
             page = pag.page(page_num)
         except:
             page=pag.page(1)
-
+        context['name'] = 'test'
         context['product_filter'] = product_filter
         context['product_pagination'] = page
         return context
@@ -178,6 +181,33 @@ class CartView(generic.ListView):
             form = CartProductChangeCountForm(request.POST or None, instance=item)
             if form.is_valid():
                 form.save()
+        if 'send' in request.POST:
+            adress = request.POST.get('mail')
+            # item = CartProducts.objects.filter(CartId=3)
+            cart_id = Cart.objects.get(UserId = request.user.id)
+            context = {'product': Products.objects.all()}
+            context['cart'] = CartProducts.objects.filter(CartId=cart_id)
+            file = render_to_string('test.html', context, request)
+
+            text_content='testowanie wpisu'
+            msg= EmailMultiAlternatives(
+                    # sumbejct
+                    'Twój koszyk',
+                    #content
+
+                    # to
+                    to=[adress],
+                    # from
+                    from_email = '',
+            )
+            msg.attach_alternative(file, "text/html")
+            # msg.send()
+            # print(file)
+            print('te')
+            messages.info(request, 'hasło nie zostało zmienione')
+
+
+
         return redirect('Products:Cart')
 
     def get_queryset(self):
