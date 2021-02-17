@@ -188,24 +188,24 @@ class CartView(generic.ListView):
             context = {'product': Products.objects.all()}
             context['cart'] = CartProducts.objects.filter(CartId=cart_id)
             file = render_to_string('test.html', context, request)
+            if adress:
 
-            text_content='testowanie wpisu'
-            msg= EmailMultiAlternatives(
-                    # sumbejct
-                    'Twój koszyk',
-                    #content
+                text_content='testowanie wpisu'
+                msg= EmailMultiAlternatives(
+                        # sumbejct
+                        'Twój koszyk',
+                        #content
 
-                    # to
-                    to=[adress],
-                    # from
-                    from_email = '',
-            )
-            msg.attach_alternative(file, "text/html")
-            # msg.send()
-            # print(file)
-            print('te')
-            messages.info(request, 'hasło nie zostało zmienione')
-
+                        # to
+                        to=[adress],
+                        # from
+                        from_email = '',
+                )
+                msg.attach_alternative(file, "text/html")
+                msg.send()
+                messages.info(request, 'Email został wysłany')
+            else:
+                messages.info(request, 'wpisz adres')
 
 
         return redirect('Products:Cart')

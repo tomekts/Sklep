@@ -5,12 +5,14 @@
 
 
 
-
+{% for message in messages %}
+            <p id="messages">{{message}}</p>
+        {% endfor %}
 {% if products_in_cart %}
     <form method="post" name="send" action="">
         {% csrf_token %}
         <input type="submit" name=send value="wyslij swój koszyk na email ">
-        <input type="email" name="mail" value={{request.user.email}}>
+        <input type="email" name="mail" placeholder="wpisz email" value={{request.user.email}}>
 
     </form>
 

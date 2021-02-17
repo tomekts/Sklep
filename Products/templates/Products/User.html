@@ -3,7 +3,7 @@
 
 <h1>Witaj {{request.user}}</h1>
 
-
+        Twój.email {{request.user.email}}<p></p>
         <a href="{% url 'Products:User-password' %}">zmien hasło</a>
 
 
