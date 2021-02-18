@@ -3,9 +3,13 @@
 <a href="{% url 'Products:Main' %}"><img src="{% static 'Images/home-icon.png' %}" alt="cos niedziała XD" width="40" height="40"></a>
 
   <div style="width:300px; display:inline ">
-  wyszukiwarka
   <form method="GET" style="width:300px; display:inline" action="/search/">
+    {% if '/search/' in request.get_full_path %}
     {{product_filter.form.title__icontains}}
+    {% else %}
+    <input  name="title__icontains" type="text" placeholder="szukaj np. intel">
+    {% endif %}
+
     <input  type="submit" value="Szukaj ">
 
   </form>

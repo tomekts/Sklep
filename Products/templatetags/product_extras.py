@@ -13,7 +13,6 @@ def my_url(value, field_name, urlencode=None):
         filter_query = filter(lambda p: p.split('=')[0]!=field_name, quer)
 
         encoded = '&'.join(filter_query)
-        print(encoded)
         url = '{}&{}'.format(url, encoded)
 
     return url

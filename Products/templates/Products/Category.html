@@ -11,13 +11,9 @@
         {% endfor %}
 
 <a href="{% my_url 'asc' 'ordering'  request.GET.urlencode %}"> Cena /\</a>
-<a href="{% my_url 'dsc' 'ordering'  request.GET.urlencode %}"> Cena \/</a>
+<a href="{% my_url 'dsc' 'ordering'  request.GET.urlencode %}"> Cena \/</a></p>
 
-<form method="GET">
-    {{product_filter.form.ordering}}
-    <input class="btn login_btn" type="submit" value="sortuj">
 
-</form>
 
  {% for product in product_pagination %}
 

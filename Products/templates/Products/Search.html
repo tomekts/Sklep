@@ -11,52 +11,53 @@
         {% endfor %}
 
 <a href="{% my_url 'asc' 'ordering'  request.GET.urlencode %}"> Cena /\</a>
-<a href="{% my_url 'dsc' 'ordering'  request.GET.urlencode %}"> Cena \/</a>
+<a href="{% my_url 'dsc' 'ordering'  request.GET.urlencode %}"> Cena \/</a></p>
 
-<form method="GET">
-    {{product_filter.form.ordering}}
-    <input class="btn login_btn" type="submit" value="sortuj">
 
-</form>
+{% if product_pagination %}
 
- {% for product in product_pagination %}
+
+     {% for product in product_pagination %}
 
 
 
-            <div style="width:500px; float:left "><a href="{% url 'Products:Product' product.id %}">{{ product.title }}</a>
+                <div style="width:500px; float:left "><a href="{% url 'Products:Product' product.id %}">{{ product.title }}</a>
 
-                <div style="width:500px; float:left ">
+                    <div style="width:500px; float:left ">
 
-                    <div style="width:100px; margin-top: 15px; float:left ">
-                        {% if  request.user.is_authenticated%}
-                        <form method="POST" action="">
-                            {% csrf_token %}
+                        <div style="width:100px; margin-top: 15px; float:left ">
+                            {% if  request.user.is_authenticated%}
+                            <form method="POST" action="">
+                                {% csrf_token %}
 
-                            {% render_field form.Count  value='1' hidden=True   %}
-                            {% render_field form.cart   value=cart hidden=True %}
-                             {% render_field form.product value=product.id hidden=True %}
+                                {% render_field form.Count  value='1' hidden=True   %}
+                                {% render_field form.cart   value=cart hidden=True %}
+                                 {% render_field form.product value=product.id hidden=True %}
 
-                            <input class="btn login_btn" type="submit" value="dodaj do koszyka ">
+                                <input class="btn login_btn" type="submit" value="dodaj do koszyka ">
 
-                     </form>
-                        {% endif %}
+                         </form>
+                            {% endif %}
+                        </div>
                     </div>
                 </div>
-            </div>
-             <div style="width:200px; float:left ">
-                        </p>Cena: {{ product.price }}
-             </div>
-            <div style="width:100px; float:right "><img src=" {{product.image.url}}" alt="cos niedziała XD" height="100px"></p></div>
-            <div style="clear:both"></div>
+                 <div style="width:200px; float:left ">
+                            </p>Cena: {{ product.price }}
+                 </div>
+                <div style="width:100px; float:right "><img src=" {{product.image.url}}" alt="cos niedziała XD" height="100px"></p></div>
+                <div style="clear:both"></div>
 
-        {% endfor %}
- {% if product_pagination.has_previous %}
-            <a href="{% my_url 1 'page'  request.GET.urlencode %}"> 1</a>
-            <a href="{% my_url product_pagination.previous_page_number 'page'  request.GET.urlencode %}">< Strona</a>
-        {% endif %}
-{% if product_pagination.has_next %}
-            <a href="{% my_url product_pagination.next_page_number 'page'  request.GET.urlencode %}"> Strona ></a>
-            <a href="{% my_url product_pagination.paginator.num_pages 'page'  request.GET.urlencode %}">{{product_pagination.paginator.num_pages}}</a>
-        {% endif %}
+            {% endfor %}
+     {% if product_pagination.has_previous %}
+                <a href="{% my_url 1 'page'  request.GET.urlencode %}"> 1</a>
+                <a href="{% my_url product_pagination.previous_page_number 'page'  request.GET.urlencode %}">< Strona</a>
+            {% endif %}
+    {% if product_pagination.has_next %}
+                <a href="{% my_url product_pagination.next_page_number 'page'  request.GET.urlencode %}"> Strona ></a>
+                <a href="{% my_url product_pagination.paginator.num_pages 'page'  request.GET.urlencode %}">{{product_pagination.paginator.num_pages}}</a>
+            {% endif %}
+{% else %}
+brak produktow
+{% endif %}
 
 {% endblock %}
