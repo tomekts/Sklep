@@ -67,6 +67,8 @@ class MainView(generic.ListView):
     context_object_name = 'category_list'
 
 
+
+
 class CategoriesView(generic.ListView):
     template_name = 'Products/Categories.html'
     context_object_name = 'category_list'
@@ -119,6 +121,50 @@ class CategoryView(generic.DetailView):
         context['product_pagination'] = page
         return context
 
+
+class SearchView(generic.ListView):
+    model = Category
+    template_name = 'Products/Search.html'
+    context_object_name = 'category'
+
+    def post(self, request):
+        form = CartProductForm(request.POST)
+        id_product = request.POST.get('product')
+        cart_id_user = Cart.objects.get(UserId=self.request.user.id)
+        check_product_in_cart = CartProducts.objects.filter(CartId=cart_id_user, ProductsId=id_product)
+        paginate_by = 2
+        if not check_product_in_cart:
+            if form.is_valid():
+                form.save()
+                messages.info(request, 'dodano produkt')
+        else:
+            messages.info(request, 'produkt juz w koszyku')
+
+        return redirect('Products:Search')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        if self.request.user.is_authenticated:
+            cart_id, bool = Cart.objects.filter(UserId=self.request.user.id).get_or_create(
+                defaults={'UserId': self.request.user})
+            context['form'] = CartProductForm(initial={'CartId': cart_id, 'ProductsId': self.kwargs.get('pk')})
+            context['cart'] = cart_id
+
+        context['category_list'] = Category.objects.all()
+        # context['product_in_cat'] = Products.objects.filter(category_id=self.kwargs.get('pk'))
+        product = Products.objects.all()
+        product_filter = ProductFilter(self.request.GET, queryset=product)
+
+        pag = Paginator(product_filter.qs, 4)
+        page_num = self.request.GET.get('page', 1)
+        try:
+            page = pag.page(page_num)
+        except:
+            page = pag.page(1)
+        context['name'] = 'test'
+        context['product_filter'] = product_filter
+        context['product_pagination'] = page
+        return context
 
 class Login(generic.TemplateView):
     template_name = 'Products/Login.html'

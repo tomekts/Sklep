@@ -20,6 +20,7 @@ urlpatterns = [
     path('password/', views.UserChangPasswordView.as_view(), name='User-password'),
     path('user/', views.UserView.as_view(), name='User'),
     path('producer/<int:pk>/', views.ProducerView.as_view(), name='Producer'),
+    path('search/', views.SearchView.as_view(), name='Search'),
 
 
 

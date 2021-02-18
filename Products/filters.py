@@ -11,6 +11,7 @@ class ProductFilter(django_filters.FilterSet):
     )
 
     ordering = django_filters.ChoiceFilter(label='bla', choices=CHOICES, method='filter_b')
+
     class Meta:
         model = Products
         fields = {

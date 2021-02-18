@@ -1,7 +1,16 @@
 {% load static %}
+<div style="width:700px; display:inline ">
 <a href="{% url 'Products:Main' %}"><img src="{% static 'Images/home-icon.png' %}" alt="cos niedziała XD" width="40" height="40"></a>
 
-  Belka do ogarnięcia w przyszłości
+  <div style="width:300px; display:inline ">
+  wyszukiwarka
+  <form method="GET" style="width:300px; display:inline" action="/search/">
+    {{product_filter.form.title__icontains}}
+    <input  type="submit" value="Szukaj ">
+
+  </form>
+  </div>
+
 {% if  request.user.is_authenticated%}
 
 <a href="{% url 'Products:Logout' %}">wyloguj</a>
@@ -16,4 +25,4 @@
 
 <a href="{% url 'Products:Login' %}">zaloguj</a>
 {% endif %}
-
+</div>
