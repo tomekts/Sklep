@@ -18,7 +18,6 @@ class EditProfilForm(UserChangeForm):
         fields = ['username', 'email', 'first_name', 'last_name']
 
 
-
 class CartProductForm(forms.ModelForm):
     product = forms.IntegerField()
     cart = forms.IntegerField()

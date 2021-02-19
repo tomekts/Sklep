@@ -6,6 +6,7 @@ from django.http import HttpResponseRedirect
 from django.views import generic
 from django.views.generic import ListView
 from django.contrib.auth.forms import PasswordChangeForm, UserChangeForm
+from django.contrib.auth.views import PasswordChangeView
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from django.contrib.auth import update_session_auth_hash
@@ -267,28 +268,19 @@ class CartView(generic.ListView):
         context['cart'] = Cart
         return context
 
-
-class UserChangPasswordView(generic.TemplateView):
+class UserChangPasswordView(PasswordChangeView, SuccessMessageMixin):
+    from_class = PasswordChangeForm
     template_name = 'Products/User-password.html'
+    success_url = '/user/'
+
+    def form_valid(self, form):
+        messages.info(self.request, 'Hasło zostało zmienione')
+        return super().form_valid(form)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['category_list'] = Category.objects.all()
-        context['form'] = PasswordChangeForm(self.request.user)
         return context
-
-    def post(self, request):
-        form = PasswordChangeForm(request.user, request.POST)
-
-        if form.is_valid():
-            form.save()
-            update_session_auth_hash(request, form.user)
-            messages.success(request, 'hasło zostało zmienione')
-        else:
-             messages.info(request, 'hasło nie zostało zmienione')
-
-
-        return redirect('Products:User')
 
 
 class UserView(generic.UpdateView, SuccessMessageMixin):
