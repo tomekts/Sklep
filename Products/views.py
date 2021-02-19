@@ -18,7 +18,26 @@ from .filters import ProductFilter
 from django.template.loader import render_to_string
 from django.core.mail import send_mail, EmailMultiAlternatives
 # Create your views here.
+from django.contrib.messages.views import SuccessMessageMixin
 
+
+
+def send_email(subject, adress, massage, request):
+    if adress:
+        msg = EmailMultiAlternatives(
+            # sumbejct
+            subject,
+            # content
+            # to
+            to=[adress],
+            # from
+            from_email='',
+        )
+        msg.attach_alternative(massage, "text/html")
+        msg.send()
+        messages.info(request, 'Email został wysłany')
+    else:
+        messages.info(request, 'wpisz adres')
 
 class ProducerView(generic.DetailView):
     template_name = 'Products/Producer.html'
@@ -175,7 +194,7 @@ class Login(generic.TemplateView):
         password = request.POST.get('password')
 
         user = authenticate(request, username=username, password=password)
-
+        print(request)
         if user is not None:
             login(request, user)
             return redirect('Products:Main')
@@ -233,26 +252,7 @@ class CartView(generic.ListView):
             context = {'product': Products.objects.all()}
             context['cart'] = CartProducts.objects.filter(CartId=cart_id)
             file = render_to_string('test.html', context, request)
-            if adress:
-
-                text_content='testowanie wpisu'
-                msg= EmailMultiAlternatives(
-                        # sumbejct
-                        'Twój koszyk',
-                        #content
-
-                        # to
-                        to=[adress],
-                        # from
-                        from_email = '',
-                )
-                msg.attach_alternative(file, "text/html")
-                msg.send()
-                messages.info(request, 'Email został wysłany')
-            else:
-                messages.info(request, 'wpisz adres')
-
-
+            send_email("Twój koszyk", adress,file, request)
         return redirect('Products:Cart')
 
     def get_queryset(self):
@@ -291,23 +291,23 @@ class UserChangPasswordView(generic.TemplateView):
         return redirect('Products:User')
 
 
-class UserView(generic.TemplateView):
+class UserView(generic.UpdateView, SuccessMessageMixin):
+    form_class = EditProfilForm
+    success_url = '/user/'
     template_name = 'Products/User.html'
 
-    def post(self, request):
-
-        form = EditProfilForm(request.POST, instance=request.user)
-        if form.is_valid():
-            form.save()
-            messages.success(request, 'Dane zostały zapisane')
-        else:
-            messages.success(request, 'Błąd zapisu danych')
+    def form_valid(self, form):
+        messages.info(self.request, 'dane zostały zapiasne')
+        form.save()
         return redirect('Products:User')
+
+
+    def get_object(self):
+        return self.request.user
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['category_list'] = Category.objects.all()
-        context['form'] = EditProfilForm(instance=self.request.user)
         return context
 
 
