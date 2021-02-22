@@ -22,7 +22,7 @@
        <form method="POST" action="">
            {% csrf_token %}
 
-           {% render_field form.Count  value='1'    %}
+           {% render_field form.Count  value='1'    max=100%}
            {% render_field form.cart   value=cartid  hidden=true %}
            {% render_field form.product value=object.id  hidden=true %}
            <input class="btn login_btn" type="submit" value="dodaj do koszyka">
@@ -36,7 +36,7 @@
 
 
         {% else %}
-        zaloguj sie aby muc dodac produkt do koszyka
+        zaloguj sie aby móc dodac produkt do koszyka
         {%  endif%}
     </div>
     <div style="width:200px; float:left  ">
