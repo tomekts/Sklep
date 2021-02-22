@@ -18,10 +18,13 @@ from django.core.paginator import Paginator
 from .filters import ProductFilter
 from django.template.loader import render_to_string
 from django.core.mail import send_mail, EmailMultiAlternatives
+from django_filters.views import FilterView
 # Create your views here.
 from django.contrib.messages.views import SuccessMessageMixin
 
 
+def category_list():
+    return {'category_list' : Category.objects.all()}
 
 def send_email(subject, adress, massage, request):
     if adress:
@@ -45,10 +48,6 @@ class ProducerView(generic.DetailView):
     context_object_name = 'producer_list'
     model = Producer
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['category_list'] = Category.objects.all()
-        return context
 
 
 class ProductView(generic.DetailView):
@@ -72,7 +71,6 @@ class ProductView(generic.DetailView):
     def get_context_data(self, **kwargs):
 
         context = super().get_context_data(**kwargs)
-        context['category_list'] = Category.objects.all()
         if self.request.user.is_authenticated:
             cart_id, bool = Cart.objects.filter(UserId=self.request.user.id).get_or_create(defaults={'UserId': self.request.user})
             context['product_in_cat'] = CartProducts.objects.filter(CartId=cart_id)
@@ -81,20 +79,13 @@ class ProductView(generic.DetailView):
         return context
 
 
-class MainView(generic.ListView):
-    model = Category
+class MainView(generic.TemplateView):
     template_name = 'Products/Main.html'
-    context_object_name = 'category_list'
-
 
 
 
 class CategoriesView(generic.ListView):
     template_name = 'Products/Categories.html'
-    context_object_name = 'category_list'
-
-    def get_queryset(self):
-        return Category.objects.all()
 
 
 class CategoryView(generic.DetailView):
@@ -125,7 +116,6 @@ class CategoryView(generic.DetailView):
             context['form'] = CartProductForm(initial={'CartId': cart_id, 'ProductsId': self.kwargs.get('pk')})
             context['cart'] = cart_id
 
-        context['category_list'] = Category.objects.all()
         # context['product_in_cat'] = Products.objects.filter(category_id=self.kwargs.get('pk'))
         product = Products.objects.filter(category_id=self.kwargs.get('pk'))
         product_filter = ProductFilter(self.request.GET, queryset=product)
@@ -142,10 +132,10 @@ class CategoryView(generic.DetailView):
         return context
 
 
-class SearchView(generic.ListView):
-    model = Category
+class SearchView(FilterView):
+    filterset_class = ProductFilter
     template_name = 'Products/Search.html'
-    context_object_name = 'category'
+    paginate_by = 4  # if pagination is desired
 
     def post(self, request):
         form = CartProductForm(request.POST)
@@ -164,27 +154,58 @@ class SearchView(generic.ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        context['product_filter'] = ProductFilter(self.request.GET)
         if self.request.user.is_authenticated:
             cart_id, bool = Cart.objects.filter(UserId=self.request.user.id).get_or_create(
-                defaults={'UserId': self.request.user})
+                        defaults={'UserId': self.request.user})
             context['form'] = CartProductForm(initial={'CartId': cart_id, 'ProductsId': self.kwargs.get('pk')})
             context['cart'] = cart_id
-
-        context['category_list'] = Category.objects.all()
-        # context['product_in_cat'] = Products.objects.filter(category_id=self.kwargs.get('pk'))
-        product = Products.objects.all()
-        product_filter = ProductFilter(self.request.GET, queryset=product)
-
-        pag = Paginator(product_filter.qs, 4)
-        page_num = self.request.GET.get('page', 1)
-        try:
-            page = pag.page(page_num)
-        except:
-            page = pag.page(1)
-        context['name'] = 'test'
-        context['product_filter'] = product_filter
-        context['product_pagination'] = page
         return context
+
+
+# class SearchView(generic.ListView):
+#     model = Category
+#     template_name = 'Products/Search.html'
+#     context_object_name = 'category'
+#
+#     def post(self, request):
+#         form = CartProductForm(request.POST)
+#         id_product = request.POST.get('product')
+#         cart_id_user = Cart.objects.get(UserId=self.request.user.id)
+#         check_product_in_cart = CartProducts.objects.filter(CartId=cart_id_user, ProductsId=id_product)
+#         paginate_by = 2
+#         if not check_product_in_cart:
+#             if form.is_valid():
+#                 form.save()
+#                 messages.info(request, 'dodano produkt')
+#         else:
+#             messages.info(request, 'produkt juz w koszyku')
+#
+#         return redirect('Products:Search')
+#
+#     def get_context_data(self, **kwargs):
+#         context = super().get_context_data(**kwargs)
+#         if self.request.user.is_authenticated:
+#             cart_id, bool = Cart.objects.filter(UserId=self.request.user.id).get_or_create(
+#                 defaults={'UserId': self.request.user})
+#             context['form'] = CartProductForm(initial={'CartId': cart_id, 'ProductsId': self.kwargs.get('pk')})
+#             context['cart'] = cart_id
+#
+#         context['category_list'] = Category.objects.all()
+#         # context['product_in_cat'] = Products.objects.filter(category_id=self.kwargs.get('pk'))
+#         product = Products.objects.all()
+#         product_filter = ProductFilter(self.request.GET, queryset=product)
+#
+#         pag = Paginator(product_filter.qs, 4)
+#         page_num = self.request.GET.get('page', 1)
+#         try:
+#             page = pag.page(page_num)
+#         except:
+#             page = pag.page(1)
+#         context['name'] = 'test'
+#         context['product_filter'] = product_filter
+#         context['product_pagination'] = page
+#         return context
 
 class Login(generic.TemplateView):
     template_name = 'Products/Login.html'
@@ -234,7 +255,6 @@ class RegisterView (generic.TemplateView):
 
 class CartView(generic.ListView):
     template_name = 'Products/Cart.html'
-    context_object_name = 'category_list'
 
     def post(self, request):
         if 'delete' in request.POST:
@@ -268,6 +288,7 @@ class CartView(generic.ListView):
         context['cart'] = Cart
         return context
 
+
 class UserChangPasswordView(PasswordChangeView, SuccessMessageMixin):
     from_class = PasswordChangeForm
     template_name = 'Products/User-password.html'
@@ -292,7 +313,6 @@ class UserView(generic.UpdateView, SuccessMessageMixin):
         messages.info(self.request, 'dane zostały zapiasne')
         form.save()
         return redirect('Products:User')
-
 
     def get_object(self):
         return self.request.user
