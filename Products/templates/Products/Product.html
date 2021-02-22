@@ -22,7 +22,7 @@
        <form method="POST" action="">
            {% csrf_token %}
 
-           {% render_field form.Count  type="number" step="3" value='1'  min=3   max=100 %}
+           {% render_field form.Count  type="number" step=1 value='1'  min=1   max=100 %}
            {% render_field form.cart   value=cartid  hidden=true %}
            {% render_field form.product value=object.id  hidden=true %}
            <input class="btn login_btn" type="submit" value="dodaj do koszyka">
