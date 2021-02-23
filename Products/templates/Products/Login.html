@@ -109,7 +109,9 @@
 				 {% for message in messages %}
     			<li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
    				 {% endfor %}
-
+				{% if form.errors %}
+				<p>Błędne hasło lub login</p>
+				{% endif %}
 				<div class="mt-4">
 					<div class="d-flex justify-content-center links">
 						Nie masz konta? <a href="{% url 'Products:Register' %}" class="ml-2">Rejestracja</a>

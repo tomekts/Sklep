@@ -45,7 +45,7 @@ class CartProductChangeCountForm(forms.ModelForm):
         instance = super(CartProductChangeCountForm, self).save(commit=False)
         c = (self.data['Count'])
         w = int(float(c))
-        
+
         instance.Count = w
         instance.CartId = CartProducts.objects.get(pk=self.data['product']).CartId
 

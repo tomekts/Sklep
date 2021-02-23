@@ -8,6 +8,7 @@ from django.views.generic import ListView
 from django.contrib.auth.forms import PasswordChangeForm, UserChangeForm
 from django.contrib.auth.views import PasswordChangeView
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.views import LoginView, LogoutView
 from django.contrib import messages
 from django.contrib.auth import update_session_auth_hash
 from .forms import CreateUserForm, CartProductForm, CartProductChangeCountForm, EditProfilForm
@@ -19,12 +20,11 @@ from .filters import ProductFilter
 from django.template.loader import render_to_string
 from django.core.mail import send_mail, EmailMultiAlternatives
 from django_filters.views import FilterView
+from django.urls import reverse_lazy
 # Create your views here.
 from django.contrib.messages.views import SuccessMessageMixin
 
 
-def category_list():
-    return {'category_list' : Category.objects.all()}
 
 def send_email(subject, adress, massage, request):
     if adress:
@@ -163,97 +163,46 @@ class SearchView(FilterView):
         return context
 
 
-# class SearchView(generic.ListView):
-#     model = Category
-#     template_name = 'Products/Search.html'
-#     context_object_name = 'category'
-#
-#     def post(self, request):
-#         form = CartProductForm(request.POST)
-#         id_product = request.POST.get('product')
-#         cart_id_user = Cart.objects.get(UserId=self.request.user.id)
-#         check_product_in_cart = CartProducts.objects.filter(CartId=cart_id_user, ProductsId=id_product)
-#         paginate_by = 2
-#         if not check_product_in_cart:
-#             if form.is_valid():
-#                 form.save()
-#                 messages.info(request, 'dodano produkt')
-#         else:
-#             messages.info(request, 'produkt juz w koszyku')
-#
-#         return redirect('Products:Search')
-#
-#     def get_context_data(self, **kwargs):
-#         context = super().get_context_data(**kwargs)
-#         if self.request.user.is_authenticated:
-#             cart_id, bool = Cart.objects.filter(UserId=self.request.user.id).get_or_create(
-#                 defaults={'UserId': self.request.user})
-#             context['form'] = CartProductForm(initial={'CartId': cart_id, 'ProductsId': self.kwargs.get('pk')})
-#             context['cart'] = cart_id
-#
-#         context['category_list'] = Category.objects.all()
-#         # context['product_in_cat'] = Products.objects.filter(category_id=self.kwargs.get('pk'))
-#         product = Products.objects.all()
-#         product_filter = ProductFilter(self.request.GET, queryset=product)
-#
-#         pag = Paginator(product_filter.qs, 4)
-#         page_num = self.request.GET.get('page', 1)
-#         try:
-#             page = pag.page(page_num)
-#         except:
-#             page = pag.page(1)
-#         context['name'] = 'test'
-#         context['product_filter'] = product_filter
-#         context['product_pagination'] = page
-#         return context
-
-class Login(generic.TemplateView):
+class Login(LoginView, SuccessMessageMixin):
     template_name = 'Products/Login.html'
 
-    def post(self, request):
 
-        username = request.POST.get('username')
-        password = request.POST.get('password')
+# class Login(generic.TemplateView):
+#     template_name = 'Products/Login.html'
+#
+#     def post(self, request):
+#
+#         username = request.POST.get('username')
+#         password = request.POST.get('password')
+#
+#         user = authenticate(request, username=username, password=password)
+#         print(request)
+#         if user is not None:
+#             login(request, user)
+#             return redirect('Products:Main')
+#         else:
+#             return render(request, 'Products/Login.html',
+#                           messages.info(request, 'błedne hasło lub login'))
+#
+#     def get_queryset(self):
+#         return Category.objects.all()
 
-        user = authenticate(request, username=username, password=password)
-        print(request)
-        if user is not None:
-            login(request, user)
-            return redirect('Products:Main')
-        else:
-            return render(request, 'Products/Login.html',
-                          messages.info(request, 'błedne hasło lub login'))
 
-    def get_queryset(self):
-        return Category.objects.all()
-
-
-class LogoutView(generic.TemplateView):
+class LogoutView(LogoutView):
     template_name = 'Products/Main.html'
 
-    def get(self, request):
-        logout(request)
-        return redirect('Products:Main')
 
-
-class RegisterView (generic.TemplateView):
+class RegisterView (generic.FormView, SuccessMessageMixin):
+    form_class = CreateUserForm
+    success_url = reverse_lazy('Products:Login')
     template_name = 'Products/Register.html'
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['form'] = CreateUserForm
-        return context
-
-    def post(self,request):
-        form = CreateUserForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return redirect('Products:Login')
-        context = {'form': form}
-        return render(request, 'Products/Register.html', context)
+    def form_valid(self, form):
+        messages.info(self.request, 'Użytkownik założony')
+        return super().form_valid(form)
 
 
-class CartView(generic.ListView):
+class CartView(ListView):
     template_name = 'Products/Cart.html'
 
     def post(self, request):
@@ -268,7 +217,6 @@ class CartView(generic.ListView):
                 form.save()
         if 'send' in request.POST:
             adress = request.POST.get('mail')
-            # item = CartProducts.objects.filter(CartId=3)
             cart_id = Cart.objects.get(UserId = request.user.id)
             context = {'product': Products.objects.all()}
             context['cart'] = CartProducts.objects.filter(CartId=cart_id)
@@ -306,21 +254,16 @@ class UserChangPasswordView(PasswordChangeView, SuccessMessageMixin):
 
 class UserView(generic.UpdateView, SuccessMessageMixin):
     form_class = EditProfilForm
-    success_url = '/user/'
+    success_url = reverse_lazy('Products:User')
     template_name = 'Products/User.html'
 
     def form_valid(self, form):
         messages.info(self.request, 'dane zostały zapiasne')
-        form.save()
-        return redirect('Products:User')
+        return super().form_valid(form)
 
     def get_object(self):
         return self.request.user
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['category_list'] = Category.objects.all()
-        return context
 
 
 class UserViewSet(viewsets.ModelViewSet):
