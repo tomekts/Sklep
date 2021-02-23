@@ -5,10 +5,11 @@ from django.http import HttpResponse
 from django.http import HttpResponseRedirect
 from django.views import generic
 from django.views.generic import ListView
-from django.contrib.auth.forms import PasswordChangeForm, UserChangeForm
+from django.contrib.auth.forms import PasswordChangeForm, UserChangeForm, PasswordResetForm
 from django.contrib.auth.views import PasswordChangeView
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.views import LoginView, LogoutView
+from django.contrib.auth import views as auth_views
 from django.contrib import messages
 from django.contrib.auth import update_session_auth_hash
 from .forms import CreateUserForm, CartProductForm, CartProductChangeCountForm, EditProfilForm
@@ -28,6 +29,7 @@ from django.contrib.messages.views import SuccessMessageMixin
 
 def send_email(subject, adress, massage, request):
     if adress:
+        Pass
         msg = EmailMultiAlternatives(
             # sumbejct
             subject,
@@ -192,14 +194,21 @@ class LogoutView(LogoutView):
     template_name = 'Products/Main.html'
 
 
-class RegisterView (generic.FormView, SuccessMessageMixin):
-    form_class = CreateUserForm
-    success_url = reverse_lazy('Products:Login')
+class RegisterView (generic.TemplateView):
     template_name = 'Products/Register.html'
 
-    def form_valid(self, form):
-        messages.info(self.request, 'Użytkownik założony')
-        return super().form_valid(form)
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['form'] = CreateUserForm
+        return context
+
+    def post(self,request):
+        form = CreateUserForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('Products:Login')
+        context = {'form': form}
+        return render(request, 'Products/Register.html', context)
 
 
 class CartView(ListView):
@@ -263,6 +272,23 @@ class UserView(generic.UpdateView, SuccessMessageMixin):
 
     def get_object(self):
         return self.request.user
+
+
+class ResetPasswordView (auth_views.PasswordResetView):
+    success_url = reverse_lazy('Products:password_reset_done')
+    template_name = 'Products/Password_reset.html'
+
+
+class ResetPasswordDoneForm (auth_views.PasswordResetDoneView):
+    template_name = 'Products/Password_reset_sent.html'
+
+
+class ResetPasswordConfirmView(auth_views.PasswordResetConfirmView):
+    template_name = 'Products/Password_reset_form.html'
+    success_url = reverse_lazy('Products:password_reset_complete')
+
+class ResetPasswordCompleteView(auth_views.PasswordResetCompleteView):
+    template_name = 'Products/Password_reset_done.html'
 
 
 
