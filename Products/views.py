@@ -8,7 +8,7 @@ from django.contrib.auth.views import PasswordChangeView
 from django.contrib.auth.views import LoginView, LogoutView
 from django.contrib.auth import views as auth_views
 from django.contrib import messages
-from .utils import generate_token
+from .utils import generate_token, send_email
 from django.utils.encoding import force_bytes, force_text
 
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
@@ -29,29 +29,10 @@ from django.urls import reverse_lazy
 from django.contrib.messages.views import SuccessMessageMixin
 
 
-
-def send_email(subject, adress, massage, request):
-    if adress:
-        msg = EmailMultiAlternatives(
-            # subject
-            subject,
-            # content
-            # to
-            to=[adress],
-            # from
-            from_email='',
-        )
-        msg.attach_alternative(massage, "text/html")
-        msg.send()
-        messages.info(request, 'Email został wysłany')
-    else:
-        messages.info(request, 'wpisz adres')
-
 class ProducerView(generic.DetailView):
     template_name = 'Products/Producer.html'
     context_object_name = 'producer_list'
     model = Producer
-
 
 
 class ProductView(generic.DetailView):
@@ -85,7 +66,6 @@ class ProductView(generic.DetailView):
 
 class MainView(generic.TemplateView):
     template_name = 'Products/Main.html'
-
 
 
 class CategoriesView(generic.ListView):
@@ -221,13 +201,14 @@ class RegisterView (generic.TemplateView):
                     'domain': get_current_site(request),
                     'user': user
                 })
-                send_email("Witaj"+user.username, adress, file, request)
+                send_email("Witaj "+user.username, adress, file, request)
                 return redirect('Products:register_done')
         else:
             messages.info(request, 'Email juz jest w bazie')
 
         context = {'form': form}
         return render(request, 'Products/Register.html', context)
+
 
 class VerificationView(generic.TemplateView):
 
@@ -246,8 +227,10 @@ class VerificationView(generic.TemplateView):
             return redirect('Products:Login')
         return redirect('Products:Main')
 
+
 class RegisterDone (generic.TemplateView):
     template_name = 'Products/Register_acount.html'
+
 
 class CartView(ListView):
     template_name = 'Products/Cart.html'
