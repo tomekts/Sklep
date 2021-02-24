@@ -29,9 +29,8 @@ from django.contrib.messages.views import SuccessMessageMixin
 
 def send_email(subject, adress, massage, request):
     if adress:
-        Pass
         msg = EmailMultiAlternatives(
-            # sumbejct
+            # subject
             subject,
             # content
             # to
@@ -204,9 +203,16 @@ class RegisterView (generic.TemplateView):
 
     def post(self,request):
         form = CreateUserForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return redirect('Products:Login')
+
+        check_email=User.objects.filter(email=form.data['email'])
+        if not check_email:
+            if form.is_valid():
+                form.save()
+                messages.info(request, 'zarejestrowano uzytkownika')
+                return redirect('Products:Login')
+        else:
+            messages.info(request, 'Email juz jest w bazie')
+
         context = {'form': form}
         return render(request, 'Products/Register.html', context)
 
@@ -229,7 +235,7 @@ class CartView(ListView):
             cart_id = Cart.objects.get(UserId = request.user.id)
             context = {'product': Products.objects.all()}
             context['cart'] = CartProducts.objects.filter(CartId=cart_id)
-            file = render_to_string('test.html', context, request)
+            file = render_to_string('Products/email_message/cart_email.html', context, request)
             send_email("Twój koszyk", adress,file, request)
         return redirect('Products:Cart')
 
@@ -263,11 +269,10 @@ class UserChangPasswordView(PasswordChangeView, SuccessMessageMixin):
 
 class UserView(generic.UpdateView, SuccessMessageMixin):
     form_class = EditProfilForm
-    success_url = reverse_lazy('Products:User')
+    success_url = '/user/'
     template_name = 'Products/User.html'
 
     def form_valid(self, form):
-        messages.info(self.request, 'dane zostały zapiasne')
         return super().form_valid(form)
 
     def get_object(self):
@@ -277,6 +282,7 @@ class UserView(generic.UpdateView, SuccessMessageMixin):
 class ResetPasswordView (auth_views.PasswordResetView):
     success_url = reverse_lazy('Products:password_reset_done')
     template_name = 'Products/Password_reset.html'
+    email_template_name= 'Products/email_message/password_reset_email.html'
 
 
 class ResetPasswordDoneForm (auth_views.PasswordResetDoneView):
@@ -287,9 +293,9 @@ class ResetPasswordConfirmView(auth_views.PasswordResetConfirmView):
     template_name = 'Products/Password_reset_form.html'
     success_url = reverse_lazy('Products:password_reset_complete')
 
+
 class ResetPasswordCompleteView(auth_views.PasswordResetCompleteView):
     template_name = 'Products/Password_reset_done.html'
-
 
 
 class UserViewSet(viewsets.ModelViewSet):

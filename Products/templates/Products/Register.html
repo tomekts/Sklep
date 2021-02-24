@@ -107,7 +107,11 @@
 				 			<input class="btn login_btn" type="submit" value="Zarejestruj">
 				   		</div>
 					</form>
+
 				</div>
+				{% for message in messages %}
+    			<li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+   				 {% endfor %}
 				{{form.errors}}
 
 				<div class="mt-4">
@@ -140,13 +144,3 @@
 
 
 
-
-<h3>rejestacja</h3>
-
-
-<form method="POST" action="">
-	{% csrf_token %}
-	{{form.as_p}}
-
-	<input type="submit" name="zarejestruj">
-</form>
