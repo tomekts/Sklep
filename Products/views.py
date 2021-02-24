@@ -1,17 +1,20 @@
 from django.shortcuts import render, redirect
 from .models import Products, Category, Cart, CartProducts, Producer
 from django.contrib.auth.models import User
-from django.http import HttpResponse
-from django.http import HttpResponseRedirect
 from django.views import generic
 from django.views.generic import ListView
-from django.contrib.auth.forms import PasswordChangeForm, UserChangeForm, PasswordResetForm
+from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib.auth.views import PasswordChangeView
-from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.views import LoginView, LogoutView
 from django.contrib.auth import views as auth_views
 from django.contrib import messages
-from django.contrib.auth import update_session_auth_hash
+from .utils import generate_token
+from django.utils.encoding import force_bytes, force_text
+
+from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
+
+from django.contrib.sites.shortcuts import get_current_site
+
 from .forms import CreateUserForm, CartProductForm, CartProductChangeCountForm, EditProfilForm
 from rest_framework import viewsets
 from rest_framework import permissions
@@ -208,14 +211,43 @@ class RegisterView (generic.TemplateView):
         if not check_email:
             if form.is_valid():
                 form.save()
-                messages.info(request, 'zarejestrowano uzytkownika')
-                return redirect('Products:Login')
+                messages.info(request, 'Zarejestrowano uzytkownika')
+                user = User.objects.get(username=form.data['username'])
+
+                adress = request.POST.get('email')
+                file = render_to_string('Products/email_message/activate_email.html', {
+                    'uid': urlsafe_base64_encode(force_bytes(user.pk)),
+                    'token': generate_token.make_token(user),
+                    'domain': get_current_site(request),
+                    'user': user
+                })
+                send_email("Witaj"+user.username, adress, file, request)
+                return redirect('Products:register_done')
         else:
             messages.info(request, 'Email juz jest w bazie')
 
         context = {'form': form}
         return render(request, 'Products/Register.html', context)
 
+class VerificationView(generic.TemplateView):
+
+    def get(self, request, uidb64, token):
+        try:
+            uid = force_text(urlsafe_base64_decode(uidb64))
+            print('ers')
+            user = User.objects.get(pk=uid)
+        except Exception as identifier:
+            user = None
+        if user is not None and generate_token.check_token(user, token):
+            user.is_active = True
+            user.save()
+            messages.add_message(request, messages.SUCCESS,
+                                 'Konto zostało aktywowane')
+            return redirect('Products:Login')
+        return redirect('Products:Main')
+
+class RegisterDone (generic.TemplateView):
+    template_name = 'Products/Register_acount.html'
 
 class CartView(ListView):
     template_name = 'Products/Cart.html'
@@ -231,11 +263,11 @@ class CartView(ListView):
             if form.is_valid():
                 form.save()
         if 'send' in request.POST:
-            adress = request.POST.get('mail')
             cart_id = Cart.objects.get(UserId = request.user.id)
             context = {'product': Products.objects.all()}
             context['cart'] = CartProducts.objects.filter(CartId=cart_id)
             file = render_to_string('Products/email_message/cart_email.html', context, request)
+            adress = request.POST.get('mail')
             send_email("Twój koszyk", adress,file, request)
         return redirect('Products:Cart')
 

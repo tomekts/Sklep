@@ -20,10 +20,10 @@ urlpatterns = [
     path('user/', views.UserView.as_view(), name='User'),
     path('producer/<int:pk>/', views.ProducerView.as_view(), name='Producer'),
     path('search/', views.SearchView.as_view(), name='Search'),
-
+    path('register_done/', views.RegisterDone.as_view(), name='register_done'),
     path('reset_password/', views.ResetPasswordView.as_view(), name='reset_password'),
     path('reset_password_sent/', views.ResetPasswordDoneForm.as_view(), name='password_reset_done'),
     path('reset/<uidb64>/<token>/', views.ResetPasswordConfirmView.as_view(), name='password_reset_confirm'),
     path('reset_password_complete', views.ResetPasswordCompleteView.as_view(), name='password_reset_complete'),
-
+    path('activate/<uidb64>/<token>',views.VerificationView.as_view(), name='activate'),
 ]

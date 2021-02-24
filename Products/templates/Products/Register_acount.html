@@ -1,8 +1,8 @@
 {% extends 'Products/Main.html' %}
 {% block prs %}
 
-<h3> Hasło zostało zresetowa</h3>
-dalsze kroki zostaną wysłane na Twój Email
+<h3> Konto zostało utworzone </h3>
+Aby aktywować konto przejdz na swoją skrzynkę pocztową
 
     {% for message in messages %}
     <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
