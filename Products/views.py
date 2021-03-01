@@ -135,7 +135,7 @@ class SearchView(FilterView):
         else:
             messages.info(request, 'produkt juz w koszyku')
 
-        return redirect('Products:Search')
+        return super(SearchView, self).get(request)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
