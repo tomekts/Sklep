@@ -1,6 +1,6 @@
 
 
-<h1>Witaj {{user.username}}</h1>
+<h1>Witaj {{user.email}}</h1>
 
 <span>Właśnie utworzyłeś konto na stronie <a href="http://{{domain}}">{{domain}}</a> , w celu aktywacji swojego konta kliknij link</span>
 <span><a href="http://{{domain}}{% url 'Products:activate' uidb64=uid token=token %}"> Aktywacja konta</a></span>

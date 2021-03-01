@@ -40,7 +40,7 @@ ALLOWED_HOSTS = ['*']
 # Application definition
 
 INSTALLED_APPS = [
-    'Products.apps.ProduktyConfig',
+    'Products',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -179,3 +179,5 @@ EMAIL_HOST_PASSWORD =env('EMAIL_PASSWORD')
 
 
 LOGIN_REDIRECT_URL = 'Products:Main'
+
+AUTH_USER_MODEL = 'Products.User'

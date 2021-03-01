@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect
-from .models import Products, Category, Cart, CartProducts, Producer
-from django.contrib.auth.models import User
+from .models import Products, Category, Cart, CartProducts, Producer, User
+# from django.contrib.auth.models import User
+
 from django.views import generic
 from django.views.generic import ListView
 from django.contrib.auth.forms import PasswordChangeForm
@@ -192,7 +193,7 @@ class RegisterView (generic.TemplateView):
             if form.is_valid():
                 form.save()
                 messages.info(request, 'Zarejestrowano uzytkownika')
-                user = User.objects.get(username=form.data['username'])
+                user = User.objects.get(email=form.data['email'])
 
                 adress = request.POST.get('email')
                 file = render_to_string('Products/email_message/activate_email.html', {
@@ -201,10 +202,9 @@ class RegisterView (generic.TemplateView):
                     'domain': get_current_site(request),
                     'user': user
                 })
-                send_email("Witaj "+user.username, adress, file, request)
+                send_email("Witaj "+user.email, adress, file, request)
                 return redirect('Products:register_done')
-        else:
-            messages.info(request, 'Email juz jest w bazie')
+
 
         context = {'form': form}
         return render(request, 'Products/Register.html', context)

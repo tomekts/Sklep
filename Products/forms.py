@@ -1,7 +1,7 @@
 
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm
-from .models import CartProducts, Products,Cart
-from django.contrib.auth.models import User
+from .models import CartProducts, Products,Cart, User
+# from django.contrib.auth.models import User
 from django import forms
 from django.contrib import messages
 
@@ -9,7 +9,7 @@ from django.contrib import messages
 class CreateUserForm(UserCreationForm):
     class Meta:
         model = User
-        fields = ['username', 'email', 'password1', 'password2']
+        fields = ['email', 'password1', 'password2']
 
     def save(self, commit=True ):
         instance = super(CreateUserForm, self).save(commit=False)
@@ -22,7 +22,7 @@ class EditProfilForm(UserChangeForm):
 
     class Meta:
         model = User
-        fields = ['username',  'first_name', 'last_name']
+        fields = ['first_name', 'last_name']
 
 
 
