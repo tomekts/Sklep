@@ -148,7 +148,7 @@ class SearchView(FilterView):
         return context
 
 
-class Login(LoginView, SuccessMessageMixin):
+class Login(LoginView):
     template_name = 'Products/Login.html'
 
 
@@ -202,9 +202,8 @@ class RegisterView (generic.TemplateView):
                     'domain': get_current_site(request),
                     'user': user
                 })
-                send_email("Witaj "+user.email, adress, file, request)
+                send_email("Witaj "+user.username, adress, file, request)
                 return redirect('Products:register_done')
-
 
         context = {'form': form}
         return render(request, 'Products/Register.html', context)

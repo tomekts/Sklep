@@ -1,15 +1,16 @@
 
-from django.contrib.auth.forms import UserCreationForm, UserChangeForm
+from django.contrib.auth.forms import UserCreationForm, UserChangeForm, AuthenticationForm
 from .models import CartProducts, Products,Cart, User
 # from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
 from django import forms
 from django.contrib import messages
 
 
 class CreateUserForm(UserCreationForm):
     class Meta:
-        model = User
-        fields = ['email', 'password1', 'password2']
+        model = get_user_model()
+        fields = ['email', 'username', 'password1', 'password2']
 
     def save(self, commit=True ):
         instance = super(CreateUserForm, self).save(commit=False)

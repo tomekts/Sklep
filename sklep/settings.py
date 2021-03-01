@@ -181,3 +181,5 @@ EMAIL_HOST_PASSWORD =env('EMAIL_PASSWORD')
 LOGIN_REDIRECT_URL = 'Products:Main'
 
 AUTH_USER_MODEL = 'Products.User'
+
+AUTHENTICATION_BACKENDS = ['Products.backends.EmailBackend']
