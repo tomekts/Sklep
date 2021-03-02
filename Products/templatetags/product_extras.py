@@ -16,3 +16,9 @@ def my_url(value, field_name, urlencode=None):
         url = '{}&{}'.format(url, encoded)
 
     return url
+
+
+@register.simple_tag
+def get_obj(request):
+    obj =request
+    return obj
