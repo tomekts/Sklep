@@ -83,14 +83,13 @@ class CategoryView (ListView):
         id_product = request.POST.get('product')
         cart_id_user = Cart.objects.get(UserId=self.request.user.id)
         check_product_in_cart = CartProducts.objects.filter(CartId=cart_id_user, ProductsId=id_product)
-
         if not check_product_in_cart:
             if form.is_valid():
                 form.save()
                 messages.info(request, 'dodano produkt')
         else:
             messages.info(request, 'produkt juz w koszyku')
-        return redirect('Products:Category', pk)
+        return super(CategoryView, self).get(request)
 
     def get_queryset(self):
         queryset = Products.objects.filter(category_id=self.kwargs.get('pk'))
