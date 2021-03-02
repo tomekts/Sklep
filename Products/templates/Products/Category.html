@@ -24,7 +24,6 @@
 
  {% for product in object_list %}
 
-             <h1><a href="{% url 'Products:Product' pk=product.pk %}">{{ product.title }}</a></h1>
 
             <div style="width:500px; float:left "><a href="{% url 'Products:Product' product.id %}">{{ product.title }}</a>
 
