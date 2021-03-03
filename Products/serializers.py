@@ -1,5 +1,5 @@
 from django.contrib.auth.models import User, Group
-from .models import Products, Category, Producer, CartProducts, Cart
+from .models import Products, Category, Producer, CartProducts, Cart, User
 from rest_framework import serializers
 
 
