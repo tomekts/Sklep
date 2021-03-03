@@ -16,25 +16,25 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from rest_framework import routers
-# from Products import views
+from Products import views
 from django.conf import settings
 from django.conf.urls.static import static
 from rest_framework_simplejwt import views as jwt_views
 
-# router = routers.DefaultRouter()
-# router.register(r'users', views.UserViewSet)
-# router.register(r'products', views.ProductsViewSet)
-# router.register(r'category', views.CategoryViewSet)
-# router.register(r'producer', views.ProducerViewSet)
-# router.register(r'cartproducts', views.CartProductsViewSet)
-# router.register(r'cart', views.CartViewSet)
+router = routers.DefaultRouter()
+router.register(r'users', views.UserViewSet)
+router.register(r'products', views.ProductsViewSet)
+router.register(r'category', views.CategoryViewSet)
+router.register(r'producer', views.ProducerViewSet)
+router.register(r'cartproducts', views.CartProductsViewSet)
+router.register(r'cart', views.CartViewSet)
 
 
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('Products.urls')),
-    # path('rest/', include(router.urls)),
+    path('rest/', include(router.urls)),
     path('api-auth/', include('rest_framework.urls')),
     path('api/token/', jwt_views.TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/token/refresh/', jwt_views.TokenRefreshView.as_view(), name='token_refresh'),
