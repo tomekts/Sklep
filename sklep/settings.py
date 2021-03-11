@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/3.1/ref/settings/
 """
 
 from pathlib import Path
+from datetime import  timedelta
 import os
 import environ
 env = environ.Env(
@@ -164,10 +165,14 @@ REST_FRAMEWORK = {
     # Use Django's standard `django.contrib.auth` permissions,
     # or allow read-only access for unauthenticated users.
     'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
         'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
+
     ],
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
     ],
 }
 
@@ -183,3 +188,9 @@ LOGIN_REDIRECT_URL = 'Products:Main'
 AUTH_USER_MODEL = 'Products.User'
 
 AUTHENTICATION_BACKENDS = ['Products.backends.EmailBackend']
+
+JWT_AUTH = {
+    'JWT_EXPIRATION_DELTA': timedelta(minutes=60),
+    'JWT_SECRET_KEY': env('SECRET_JWT'),
+    'JWT_AUTH_COOKIE': 'JW',
+}

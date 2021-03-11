@@ -1,4 +1,7 @@
+import jwt
 from django.shortcuts import render, redirect
+
+
 from .models import Products, Category, Cart, CartProducts, Producer, User
 # from django.contrib.auth.models import User
 
@@ -18,7 +21,11 @@ from django.contrib.sites.shortcuts import get_current_site
 
 from .forms import CreateUserForm, CartProductForm, CartProductChangeCountForm, EditProfilForm
 from rest_framework import viewsets
+from rest_framework.views import APIView
 from rest_framework import permissions
+from rest_framework.response import Response
+from rest_framework.exceptions import AuthenticationFailed
+from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated
 from .serializers import UserSerializer, ProductsSerializer, CategorySerializer, CartSerializer, CartProductsSerializer, ProducerSerializer
 from django.core.paginator import Paginator
 from .filters import ProductFilter
@@ -28,6 +35,8 @@ from django_filters.views import FilterView
 from django.urls import reverse_lazy
 # Create your views here.
 from django.contrib.messages.views import SuccessMessageMixin
+import environ
+env = environ.Env(DEBUG=(bool, False))
 
 
 class ProducerView(generic.DetailView):
@@ -354,9 +363,29 @@ class CartViewSet(viewsets.ModelViewSet):
     #permission_classes = [permissions.IsAdminUser]
 
 
+class AccesView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request):
+        tok = request.COOKIES.get('JW')
+        try:
+            payload= jwt.decode(tok, env('SECRET_JWT'), algorithms=['HS256'])
+        except jwt.DecodeError:
+            raise AuthenticationFailed('błędny token')
+        return Response(payload, status=200)
+
+class OutView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
 
 
 
+    def post(self, request):
+        res = Response()
+        res.delete_cookie("JW")
+        res.data = {
+            'Message': 'Logout complete'
+        }
+        return res
 
 
 

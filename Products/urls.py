@@ -1,5 +1,5 @@
 from django.urls import path, include
-
+from rest_framework_jwt.views import obtain_jwt_token
 from . import views
 
 
@@ -13,6 +13,9 @@ urlpatterns = [
     path('category/<int:pk>/', views.CategoryView.as_view(), name='Category'),
     # path('category/', views.CategoriesView.as_view(), name='Categories'),
     path('login/', views.Login.as_view(), name='Login'),
+    path('log/', obtain_jwt_token, name='Log'),
+    path('out/', views.OutView.as_view(), name='Out'),
+    path('acces/', views.AccesView.as_view(), name='Acces'),
     path('logout/', views.LogoutView.as_view(), name='Logout'),
     path('register/', views.RegisterView.as_view(), name='Register'),
     path('cart/', views.CartView.as_view(), name='Cart'),
