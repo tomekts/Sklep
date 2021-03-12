@@ -9,7 +9,6 @@ django-widget-tweaks==1.4.8
 djangorestframework==3.12.2
 djangorestframework-jwt==1.11.0
 djangorestframework-simplejwt==4.6.0
-freeze==3.0
 Markdown==3.3.3
 parts==1.0.2
 Pillow==8.1.0
