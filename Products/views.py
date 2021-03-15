@@ -387,6 +387,17 @@ class OutView(APIView):
         }
         return res
 
+class Test(APIView):
+    # permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+
+    def post(self, request):
+        res = Response()
+        res.set_cookie(key="test", value="123", httponly=True, samesite='None', secure=True)
+        res.data = {
+            'Message': 'Logout complete'
+        }
+        return res
+
 
 
 

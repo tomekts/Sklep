@@ -15,6 +15,7 @@ urlpatterns = [
     path('login/', views.Login.as_view(), name='Login'),
     path('log/', obtain_jwt_token, name='Log'),
     path('out/', views.OutView.as_view(), name='Out'),
+    path('test/', views.Test.as_view(), name='test'),
     path('acces/', views.AccesView.as_view(), name='Acces'),
     path('logout/', views.LogoutView.as_view(), name='Logout'),
     path('register/', views.RegisterView.as_view(), name='Register'),
